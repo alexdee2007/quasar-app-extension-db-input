@@ -46,7 +46,7 @@
 
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" @before-show="isDirty = validate.$dirty">
+    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" @before-show="isDirty = !!get(validate, '$error')">
 
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
         <db-form
