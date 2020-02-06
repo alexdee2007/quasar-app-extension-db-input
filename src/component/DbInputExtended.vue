@@ -31,7 +31,7 @@
     </template>
 
     <template v-slot:append>
-      <q-icon 
+      <q-icon
         v-if="(!$q.platform.is.desktop && !isEmpty && !disabled) || clearable"
         name="cancel"
         color="primary"
@@ -85,7 +85,7 @@
                 <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged">
                   <q-tooltip>Застосувати зміни</q-tooltip>
                 </q-btn>
-              </q-toolbar>   
+              </q-toolbar>
             </slot>
           </q-footer>
         </db-form>
@@ -130,7 +130,7 @@
               <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged">
                 <q-tooltip>Застосувати зміни</q-tooltip>
               </q-btn>
-            </q-toolbar>          
+            </q-toolbar>
           </slot>
 
         </db-form>
@@ -202,7 +202,7 @@
         return JSON.stringify(this.initialValue) === JSON.stringify(this.value);
       },
       errorState() {
-        return this.required && this.isEmpty && this.validate.$dirty ? true : this.error.state;
+        return this.required && this.isEmpty && get(this.validate, '$error') ? true : this.error.state;
       },
       errorMessage() {
         return this.required && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки';
