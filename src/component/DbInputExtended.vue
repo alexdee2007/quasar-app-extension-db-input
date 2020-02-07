@@ -249,7 +249,6 @@
         } catch (err) {
           console.error(err);
         }
-
       },
       onInput(val) {
         this.data = cloneDeep(val);
