@@ -121,7 +121,7 @@
           <slot name="footer">
             <q-toolbar class="bg-grey-9 text-white" style="z-index:9999;">
               <q-space />
-              <q-btn v-if="showCancelButton" label="Відмінити" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
+              <q-btn v-if="showCancelButton" label="Скасувати" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
                 <q-tooltip>Відмінити зміни</q-tooltip>
               </q-btn>
               <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
@@ -138,7 +138,6 @@
     </q-dialog>
 
   </q-select>
-
 
 </template>
 
@@ -165,7 +164,7 @@
       },
       initialValue: {
         type: Object,
-        required: true
+        default: () => ({})
       },
       disabled: Boolean,
       showCancelButton: Boolean,
@@ -177,7 +176,10 @@
         type: Function,
         required: true
       },
-      dialogWidth: String,
+      dialogWidth: {
+        type: String,
+        default: '1280px'
+      },
       label: String,
       maximized: Boolean,
       required: Boolean,
