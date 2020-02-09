@@ -12,8 +12,8 @@
     :fill-input="typeof filter === 'function'"
     :hide-selected="typeof filter === 'function'"
     :class="classObj"
-    :error="errorState"
-    :error-message="errorMessage"
+    :error="error.state"
+    :error-message="error.label"
     :hint="hintLabel"
     option-value="optionId"
     :option-label="displayedValue"
@@ -182,7 +182,7 @@
       },
       label: String,
       maximized: Boolean,
-      required: Boolean,
+      require: Boolean,
       filter: Function
     },
     watch: {
@@ -203,11 +203,11 @@
       isEmpty() {
         return JSON.stringify(this.initialValue) === JSON.stringify(this.value);
       },
-      errorState() {
-        return this.required && this.isEmpty && get(this.validate, '$error') ? true : this.error.state;
-      },
-      errorMessage() {
-        return this.required && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки';
+      error() {
+        return {
+          state: this.require && this.isEmpty && get(this.validate, '$dirty') ? true : Object.keys(this.value).some(fld => get(this.validate, `${fld}.$error`)),
+          label: this.require && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки'
+        };
       }
     },
     data() {
@@ -229,8 +229,8 @@
         await this.$nextTick();
         this.$refs.form.loadedValue = cloneDeep(this.value);
       },
-      async onSubmit(value) {
-        this.$emit('input', value);
+      async onSubmit() {
+        this.$emit('input', this.data);
         await this.$nextTick();
         this.dialog = false;
       },
