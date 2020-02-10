@@ -3,15 +3,15 @@ import {lookup as mimeLookup} from 'mime-types';
 import minioApi from 'src/api/minio';
 import download from 'src/utils/download';
 import { getErrorLabel } from 'src/utils/validators';
-import EImg from 'components/EImg';
-import EPdf from 'components/EPdf';
-import PdfViewer from 'src/dialogs/PdfViewer';
+//import EImg from 'components/EImg';
+//import EPdf from 'components/EPdf';
+//import PdfViewer from 'src/dialogs/PdfViewer';
 
 export default {
     components: {
-        EImg,
-        EPdf,
-        PdfViewer
+  //      EImg,
+  //      EPdf,
+  //      PdfViewer
     },
     computed: {
         validate() {
