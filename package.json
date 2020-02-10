@@ -1,6 +1,6 @@
 {
   "name": "quasar-app-extension-db-input",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Quasar App Extension which injects a Vue component - DbInput",
   "author": "Razvan Stoenescu <razvan.stoenescu@gmail.com>",
   "license": "MIT",
