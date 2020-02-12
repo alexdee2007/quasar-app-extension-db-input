@@ -159,8 +159,13 @@
         return arr.filter(v => v.value.toLowerCase().indexOf(val) === 0).concat(arr.filter(v => v.value.toLowerCase().indexOf(val) > 0)); // cверху совпадения в начале текста
       },
       updateOptions(val, calc) {
-        const opts = this.cascade || calc ? this.calculatedOptions : this.selectOptions;
-        this.visibleOptions = val === '' ? opts : this.filter ? this.filter(opts, val.toLowerCase()) : this.filtering(opts, val.toLowerCase());
+
+        const opts = calc ? this.calculatedOptions : this.selectOptions;
+
+        this.visibleOptions = val === ''
+            ? (this.cascade ? this.calculatedOptions : this.selectOptions)
+            : (this.filter ? this.filter(opts, val.toLowerCase()) : this.filtering(opts, val.toLowerCase()));
+
       },
       onKeydown(evt) {
         if (evt.keyCode === 9 && this.multiple !== true) {
