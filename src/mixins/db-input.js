@@ -50,9 +50,9 @@ export default {
       return typeof this.dict === 'string' ? this.dict : undefined;
     },
     validate() {
-      return this.form
+      return this.validation || (this.form
           ? get(this.form.$v, this.validatePath.split('.').length === 1 ? 'value' : this.validatePath.replace(RegExp(`^${this.form.modelName}`), 'value'), {})
-          : this.validation;
+          : {});
     },
     error() {
       return {
