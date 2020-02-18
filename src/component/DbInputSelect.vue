@@ -48,7 +48,7 @@
     </template>
     <template v-slot:no-option>
       <q-item dense>
-        <q-item-section class="text-grey">Немає даних</q-item-section>
+        <q-item-section class="text-grey">{{ loading ? 'Завантаження...' : 'Немає даних'}}</q-item-section>
       </q-item>
     </template>
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
@@ -71,7 +71,7 @@
     },
     props: {
       dict: {
-        type: [String, Array],
+        type: [String, Array, Function],
         required: true
       },
       optionsDense: {
@@ -93,7 +93,8 @@
     data() {
       return {
         visibleOptions: [],
-        prepend: this.pref
+        prepend: this.pref,
+        asyncOptions: null
       }
     },
     computed: {
@@ -103,11 +104,9 @@
             : find(this.selectOptions, {key: this.value}) || {key: this.value, value: this.value};
       },
       selectOptions() {
-        let options = Array.isArray(this.dict) ? this.dict : this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`]
-            ? this.$store.getters.DICT(`${this.dictName}&language=${this.language}`)
-            : null;
+        let options = this.asyncOptions ? this.asyncOptions
+            : Array.isArray(this.dict) ? this.dict : this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] || null;
         return this.filterOptions ? options.filter(this.filterOptions) : options;
-
       },
       calculatedOptions() {
         if (!this.selectOptions) {
@@ -122,8 +121,17 @@
       }
     },
     methods: {
+      async asyncDict() {
+        try {
+          this.loading = true;
+          return await this.dict();
+        } catch (err) {
+          console.error(err);
+        } finally {
+          this.loading = false;
+        }
+      },
       onInput(val) {
-
         const key = this.multiple
             ? val.length ? val[val.length - 1].key : null
             : val === null ? null : val.key;
@@ -148,7 +156,7 @@
       async filterFn(val, update, abort) {
         try {
           this.prepend = this.pref;
-          !this.selectOptions && await this.loadDict();
+          !this.selectOptions && this.dictName && (await this.loadDict());
           update(this.updateOptions(val, this.pref !== ''));
         } catch (err) {
           console.error(err);
@@ -183,7 +191,7 @@
     mounted() {
       if (!this.selectOptions) {
         const unwatch = this.$watch('value', (val) => {
-          val !== null && this.loadDict();
+          val !== null && this.dictName && (this.loadDict());
         }, {immediate: true});
         unwatch();
       }
@@ -192,6 +200,12 @@
     created() {
       if (this.dictName && this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] === undefined) {
         this.$store.dispatch('SET_DICT', {name: `${this.dictName}&language=${this.language}`, node: null});
+      }
+      if (typeof this.dict === 'function') {
+        this.asyncOptions = [];
+        this.asyncDict().then(options => {
+          this.asyncOptions = options;
+        });
       }
     }
   }
