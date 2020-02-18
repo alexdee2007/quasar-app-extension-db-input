@@ -36,13 +36,13 @@
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ scope.opt.value }}</q-item-label>
-          <q-item-label v-if="!rightStamp" caption>{{ scope.opt.stamp }}</q-item-label>
+          <q-item-label v-if="!rightStamp" caption>{{ optionStamp ? scope.opt[optionStamp] : scope.opt.stamp }}</q-item-label>
         </q-item-section>
         <q-item-section v-if="cascade && scope.opt.key.slice(-1) === '*'" side>
           <q-icon name="list" />
         </q-item-section>
         <q-item-section v-else-if="rightStamp" side>
-          <q-item-label caption>{{ scope.opt.stamp }}</q-item-label>
+          <q-item-label caption>{{ optionStamp ? scope.opt[optionStamp] : scope.opt.stamp }}</q-item-label>
         </q-item-section>
       </q-item>
     </template>
@@ -80,7 +80,9 @@
       },
       filter: Function,
       filterOptions: Function,
+      sortOptions: Function,
       rightStamp: Boolean,
+      optionStamp: String,
       cascade: Boolean,
       cascadeMixed: Boolean,
       notDisableOptions: Boolean,
@@ -104,9 +106,20 @@
             : find(this.selectOptions, {key: this.value}) || {key: this.value, value: this.value};
       },
       selectOptions() {
+
         let options = this.asyncOptions ? this.asyncOptions
             : Array.isArray(this.dict) ? this.dict : this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] || null;
-        return this.filterOptions ? options.filter(this.filterOptions) : options;
+
+        if (this.filterOptions) {
+          options = options.filter(this.filterOptions);
+        }
+
+        if (this.sortOptions) {
+          options = options.sort(this.sortOptions);
+        }
+
+        return options;
+
       },
       calculatedOptions() {
         if (!this.selectOptions) {
