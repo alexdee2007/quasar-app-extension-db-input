@@ -55,12 +55,13 @@
           :is-dirty="isDirty"
           ref="form"
           @submit="onSubmit"
+	  :autofocus="!inputValue"
           >
           <q-header elevated >
             <slot name="header">
               <q-toolbar class="bg-primary text-white">
                 <q-toolbar-title>{{ label }}</q-toolbar-title>
-                <q-btn flat round dense icon="close" v-close-popup />
+                <q-btn flat round dense icon="close" v-close-popup :tabindex="-1" />
               </q-toolbar>
             </slot>
           </q-header>
@@ -81,7 +82,7 @@
                 <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                   <q-tooltip>Очистити форму</q-tooltip>
                 </q-btn>
-                <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" autofocus>
+                <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
                   <q-tooltip>Застосувати зміни</q-tooltip>
                 </q-btn>
               </q-toolbar>
@@ -99,11 +100,12 @@
           :is-dirty="isDirty"
           ref="form"
           @submit="onSubmit"
+	  :autofocus="!inputValue"
           >
           <slot name="header">
             <q-toolbar class="bg-primary text-white">
               <q-toolbar-title>{{ label }}</q-toolbar-title>
-              <q-btn flat round dense icon="close" v-close-popup />
+              <q-btn flat round dense icon="close" v-close-popup :tabindex="-1" />
             </q-toolbar>
           </slot>
 
@@ -126,7 +128,7 @@
               <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                 <q-tooltip>Очистити форму</q-tooltip>
               </q-btn>
-              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" autofocus>
+              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
                 <q-tooltip>Застосувати зміни</q-tooltip>
               </q-btn>
             </q-toolbar>
@@ -214,13 +216,14 @@
         dialog: false,
         clearable: false,
         visibleOptions: [],
-        newValue: null,
         isDirty: false,
-        data: this.value
+        data: this.value,
+	inputValue: false
       }
     },
     methods: {
       async onHide() {
+	this.inputValue = false;
         await this.$nextTick();
         this.data = cloneDeep(this.value);
       },
@@ -251,6 +254,7 @@
       },
       onInput(val) {
         this.data = cloneDeep(val);
+	this.inputValue = true;
         this.dialog = true;
       },
       clearValue() {
