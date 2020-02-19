@@ -82,7 +82,7 @@
                 <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                   <q-tooltip>Очистити форму</q-tooltip>
                 </q-btn>
-                <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged">
+                <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" autofocus>
                   <q-tooltip>Застосувати зміни</q-tooltip>
                 </q-btn>
               </q-toolbar>
@@ -127,7 +127,7 @@
               <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                 <q-tooltip>Очистити форму</q-tooltip>
               </q-btn>
-              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged">
+              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" autofocus>
                 <q-tooltip>Застосувати зміни</q-tooltip>
               </q-btn>
             </q-toolbar>
