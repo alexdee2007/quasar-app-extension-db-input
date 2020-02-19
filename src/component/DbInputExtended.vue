@@ -7,7 +7,6 @@
     hide-dropdown-icon
     behavior="menu"
     v-bind="$props"
-    :tabindex="typeof filter === 'function' ? '-1': '0'"
     :use-input="typeof filter === 'function'"
     :fill-input="typeof filter === 'function'"
     :hide-selected="typeof filter === 'function'"
