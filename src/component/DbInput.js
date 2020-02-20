@@ -2,17 +2,7 @@ import { get, mapValues } from 'lodash';
 import { singularize } from 'inflection';
 import models from 'src/models';
 
-import DbInputText from './DbInputText';
-import DbInputDate from './DbInputDate';
-import DbInputSelect from './DbInputSelect';
-import DbInputAutocomplete from './DbInputAutocomplete';
-import DbInputAddress from './DbInputAddress';
-import DbInputExtended from './DbInputExtended';
-//import DbInputPersPhoto from './inputs/DbInputPersPhoto';
-//import DbInputUpload from './components/inputs/DbInputUpload';
-//import DbInputList from './components/inputs/DbInputList';
-
-const getFieldName = (fieldPath) => {  //tomixins
+const getFieldName = (fieldPath) => {
   const match = fieldPath.match(/(.*)\[(\d*)\]\.([0-9A-Za-z]+)$/);
   if (match) {
     const modelName = singularize(match[1].split('.').pop());
@@ -46,24 +36,24 @@ export default {
 
     switch (type) {
       case 'select':
-        return createElement(DbInputSelect, context.data, context.children);
+        return createElement('db-input-select', context.data, context.children);
       case 'autocomplete':
-        return createElement(DbInputAutocomplete, context.data, context.children);
+        return createElement('db-input-autocomplete', context.data, context.children);
       case 'address':
-        return createElement(DbInputAddress, context.data, context.children);
+        return createElement('db-input-address', context.data, context.children);
       case 'date':
       case 'datetime':
-        return createElement(DbInputDate, context.data, context.children);
+        return createElement('db-input-date', context.data, context.children);
       case 'extended':
-        return createElement(DbInputExtended, context.data, context.children);
-//            case 'upload':
-//                return createElement(DbInputUpload, context.data, context.children);
-//            case 'pers-photo':
-//                return createElement(DbInputPersPhoto, context.data, context.children);
-//            case 'list':
-//                return createElement(DbInputList, context.data, context.children);
+        return createElement('db-input-extended', context.data, context.children);
+      case 'upload':
+        return createElement('db-input-upload', context.data, context.children);
+      case 'pers-photo':
+        return createElement('db-input-pers-photo', context.data, context.children);
+      case 'list':
+        return createElement('db-input-list', context.data, context.children);
       default:
-        return createElement(DbInputText, context.data, context.children);
+        return createElement('db-input-text', context.data, context.children);
     }
   }
 }

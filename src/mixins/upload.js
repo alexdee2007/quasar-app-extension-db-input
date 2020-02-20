@@ -1,8 +1,9 @@
 import { get } from 'lodash';
 import {lookup as mimeLookup} from 'mime-types';
 import minioApi from 'src/api/minio';
-import download from 'src/utils/download';
-import { getErrorLabel } from 'src/utils/validators';
+//import download from 'src/utils/download';
+//import { getErrorLabel } from 'src/utils/validators';
+import { getErrorLabel } from '../utils/validations';
 //import EImg from 'components/EImg';
 //import EPdf from 'components/EPdf';
 //import PdfViewer from 'src/dialogs/PdfViewer';
