@@ -72,7 +72,7 @@
                 <q-btn v-if="showCancelButton" label="Відмінити" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
                   <q-tooltip>Відмінити зміни</q-tooltip>
                 </q-btn>
-                <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
+                <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                   <q-tooltip>Очистити форму</q-tooltip>
                 </q-btn>
                 <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
@@ -118,7 +118,7 @@
               <q-btn v-if="showCancelButton" label="Скасувати" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
                 <q-tooltip>Відмінити зміни</q-tooltip>
               </q-btn>
-              <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
+              <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                 <q-tooltip>Очистити форму</q-tooltip>
               </q-btn>
               <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
@@ -160,7 +160,7 @@
       },
       disabled: Boolean,
       showCancelButton: Boolean,
-      showResetBuuton: {
+      showResetButton: {
         type: Boolean,
         default: true
       },
