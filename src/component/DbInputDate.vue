@@ -160,30 +160,3 @@
     }
   }
 </script>
-<style>
-  .db-input-date {
-    width: 180px;
-  }
-
-  .db-input-datetime {
-    width: 220px;
-  }
-
-  .q-field__bottom {
-    padding: 1px 12px;
-  }
-
-  .q-chip--dense {
-    height: auto;
-    margin-bottom: 0px;
-  }
-
-  .q-chip__content  {
-    white-space: normal;
-  }
-
-  .q-field--float .q-field__label {
-    width: 134%;
-  }
-
-</style>

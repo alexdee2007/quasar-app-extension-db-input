@@ -4,31 +4,36 @@
     <q-uploader ref="uploader" :style="{ width, height, maxHeight: height }" :color="error.state ? 'negative': 'primary'">
 
       <template v-slot:header="scope">
-        <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
-          <div class="col">
-            <div class="q-uploader__title">{{ label }}</div>
+        <slot name="header" :add="add" :scope="scope">
+          <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+            <div class="col">
+              <div class="q-uploader__title">{{ label }}</div>
+            </div>
+            <q-btn type="a" icon="add_box" dense flat @click="add">
+              <q-tooltip>Додати</q-tooltip>
+            </q-btn>
           </div>
-          <q-btn type="a" icon="add_box" dense flat @click="add">
-            <q-tooltip>Додати</q-tooltip>
-          </q-btn>
-        </div>
+        </slot>
       </template>
 
       <template v-slot:list="scope">
-
-        <q-list separator>
-          <q-item v-for="(row, index) in value" clickable class="text-black" :key="`input-list-${index}`" @click="edit(index)">
-            <q-item-section side v-if="validate.$each && validate.$each[index] && validate.$each[index].$error">
-              <q-icon color="negative" :name="scope.$q.iconSet.field.error" />
-            </q-item-section>
-            <q-item-section>{{ displayedValue(row) }}</q-item-section>
-            <q-item-section side>
-              <q-btn ize="12px" flat dense round icon="delete" @click.stop.prevent="remove(index)">
-                <q-tooltip>Видалити</q-tooltip>
-              </q-btn>
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <slot name="list" :value="value" :validate="validate" :edit="edit" :remove="remove" :scope="scope">
+          <q-list separator>
+            <q-item v-for="(row, index) in value" clickable class="text-black" :key="`input-list-${index}`" @click="edit(index)">
+              <q-item-section side v-if="validate.$each && validate.$each[index] && validate.$each[index].$error">
+                <q-icon color="negative" :name="scope.$q.iconSet.field.error" />
+              </q-item-section>
+              <slot name="list-section" :index="index" :row="row">
+                <q-item-section>{{ displayedValue(row) }}</q-item-section>
+              </slot>
+              <q-item-section side>
+                <q-btn ize="12px" flat dense round icon="delete" @click.stop.prevent="remove(index)">
+                  <q-tooltip>Видалити</q-tooltip>
+                </q-btn>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </slot>
       </template>
 
     </q-uploader>
@@ -161,7 +166,7 @@
       },
       displayedValue: {
         type: Function,
-        required: true
+        default: () => ({})
       },
       height: {
         type: String,

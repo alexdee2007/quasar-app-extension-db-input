@@ -55,7 +55,7 @@
           :is-dirty="isDirty"
           ref="form"
           @submit="onSubmit"
-	  :autofocus="!inputValue"
+          :autofocus="!inputValue"
           >
           <q-header elevated >
             <slot name="header">
@@ -100,7 +100,7 @@
           :is-dirty="isDirty"
           ref="form"
           @submit="onSubmit"
-	  :autofocus="!inputValue"
+          :autofocus="!inputValue"
           >
           <slot name="header">
             <q-toolbar class="bg-primary text-white">
@@ -218,12 +218,12 @@
         visibleOptions: [],
         isDirty: false,
         data: this.value,
-	inputValue: false
+        inputValue: false
       }
     },
     methods: {
       async onHide() {
-	this.inputValue = false;
+        this.inputValue = false;
         await this.$nextTick();
         this.data = cloneDeep(this.value);
       },
@@ -254,7 +254,7 @@
       },
       onInput(val) {
         this.data = cloneDeep(val);
-	this.inputValue = true;
+        this.inputValue = true;
         this.dialog = true;
       },
       clearValue() {
@@ -274,21 +274,3 @@
     }
   }
 </script>
-
-<style>
-
-  .q-field__bottom {
-    padding: 1px 12px;
-  }
-
-  .db-input--description .q-field__label::after {
-    content: 'help';
-    font-family: 'Material Icons';
-    margin-left: 3px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-  }
-
-</style>
