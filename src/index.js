@@ -24,13 +24,10 @@ function extendConf(conf, api) {
   if (api.prompts.types.includes('list')) {
     conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-list.js');
   }
-  if (api.prompts.types.includes('pers-photo')) {
-    conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-pers-photo.js');
-  }
   if (api.prompts.types.includes('select')) {
     conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-select.js');
   }
-  if (api.prompts.types.includes('address')) {
+  if (api.prompts.types.includes('upload')) {
     conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-upload.js');
   }
 

@@ -9,7 +9,7 @@
             <div class="col">
               <div class="q-uploader__title">{{ label }}</div>
             </div>
-            <q-btn type="a" icon="add_box" dense flat @click="add">
+            <q-btn type="a" icon="add_box" round dense flat @click="add">
               <q-tooltip>Додати</q-tooltip>
             </q-btn>
           </div>

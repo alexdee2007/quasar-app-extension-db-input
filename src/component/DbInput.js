@@ -48,8 +48,6 @@ export default {
         return createElement('db-input-extended', context.data, context.children);
       case 'upload':
         return createElement('db-input-upload', context.data, context.children);
-      case 'pers-photo':
-        return createElement('db-input-pers-photo', context.data, context.children);
       case 'list':
         return createElement('db-input-list', context.data, context.children);
       default:
