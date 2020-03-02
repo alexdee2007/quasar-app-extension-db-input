@@ -50,7 +50,7 @@
           @submit="onSubmit"
           :autofocus="!inputValue"
           >
-          <q-header elevated >
+          <q-header reveal elevated>
             <slot name="header">
               <q-toolbar class="bg-primary text-white">
                 <q-toolbar-title>{{ dialogTitle }}</q-toolbar-title>
@@ -65,7 +65,7 @@
             </q-page>
           </q-page-container>
 
-          <q-footer elevated>
+          <q-footer reveal elevated>
             <slot name="footer">
               <q-toolbar class="bg-grey-9 text-white fixed-bottom" style="z-index:9999;">
                 <q-space />
