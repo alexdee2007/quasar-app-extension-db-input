@@ -128,7 +128,7 @@
               <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
                 <q-tooltip>Очистити форму</q-tooltip>
               </q-btn>
-              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
+              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && ($refs.form.notChanged || $refs.form.isEmpty)" :autofocus="inputValue">
                 <q-tooltip>Застосувати зміни</q-tooltip>
               </q-btn>
             </q-toolbar>
@@ -167,6 +167,7 @@
         type: Object,
         default: () => ({})
       },
+      emptyObj: Boolean,
       disabled: Boolean,
       showCancelButton: Boolean,
       showResetBuuton: {
@@ -258,7 +259,7 @@
         this.dialog = true;
       },
       clearValue() {
-        this.$emit('input', this.initialValue);
+        this.$emit('input', this.emptyObj ? {} : this.initialValue);
         this.clearable = false;
       },
       mouseenter() {
