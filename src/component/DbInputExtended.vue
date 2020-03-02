@@ -202,11 +202,11 @@
         return this.maximized || this.$q.screen.lt.md
       },
       isEmpty() {
-        return JSON.stringify(this.initialValue) === JSON.stringify(this.value);
+        return Object.keys(this.value).length === 0 || JSON.stringify(this.initialValue) === JSON.stringify(this.value);
       },
       error() {
         return {
-          state: this.require && this.isEmpty && get(this.validate, '$dirty') ? true : Object.keys(this.value).some(fld => get(this.validate, `${fld}.$error`)),
+          state: this.require && this.isEmpty && get(this.validation || this.form.$v, '$dirty') ? true : Object.keys(this.value).some(fld => get(this.validate, `${fld}.$error`)),
           label: this.require && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки'
         };
       }

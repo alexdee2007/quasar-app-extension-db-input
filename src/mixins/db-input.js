@@ -103,7 +103,7 @@ export default {
     }
   },
   mounted() {
-    if (this.defaultValue !== undefined && (this.value === null || this.value.length === 0)) {
+    if (this.defaultValue !== undefined && (!this.value || this.value.length === 0)) {
       this.$nextTick(() => this.$emit('input', this.defaultValue));
     }
     this.$refs.input && this.$refs.input.$on('focus', (evt) => {
