@@ -167,7 +167,6 @@
         type: Object,
         default: () => ({})
       },
-      emptyObj: Boolean,
       disabled: Boolean,
       showCancelButton: Boolean,
       showResetBuuton: {
@@ -259,7 +258,8 @@
         this.dialog = true;
       },
       clearValue() {
-        this.$emit('input', this.emptyObj ? {} : this.initialValue);
+        const test = /(.*)\[(\d+)\]$/.test(this.fieldPath); // is array item?
+        this.$emit('input', test ? {} : this.initialValue);
         this.clearable = false;
       },
       mouseenter() {
