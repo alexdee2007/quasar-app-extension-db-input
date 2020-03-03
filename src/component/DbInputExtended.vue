@@ -180,6 +180,10 @@
         required: true
       },
       beforeSubmit: Function,
+      clearData: {
+        type: Object,
+        default: () => ({})
+      },
       dialogWidth: {
         type: String,
         default: '1280px'
@@ -261,8 +265,7 @@
         this.dialog = true;
       },
       clearValue() {
-        const test = /(.*)\[(\d+)\]$/.test(this.fieldPath); // is array item?
-        this.$emit('input', test ? {} : this.initialValue);
+        this.$emit('input', this.clearData);
         this.clearable = false;
       },
       mouseenter() {
