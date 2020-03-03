@@ -54,6 +54,7 @@
           :initial-value="initialValue"
           :is-dirty="isDirty"
           ref="form"
+	  :before-submit="beforeSubmit"
           @submit="onSubmit"
           :autofocus="!inputValue"
           >
@@ -99,6 +100,7 @@
           :initial-value="initialValue"
           :is-dirty="isDirty"
           ref="form"
+	  :before-submit="beforeSubmit"
           @submit="onSubmit"
           :autofocus="!inputValue"
           >
@@ -177,6 +179,7 @@
         type: Function,
         required: true
       },
+      beforeSubmit: Function,
       dialogWidth: {
         type: String,
         default: '1280px'
