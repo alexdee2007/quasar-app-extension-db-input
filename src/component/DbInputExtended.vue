@@ -45,7 +45,7 @@
 
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" @before-show="isDirty = validate ? validate.$dirty: false">
+    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @before-show="onBeforeShow" @show="onShow" @hide="onHide">
 
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
         <db-form
@@ -224,7 +224,7 @@
         clearable: false,
         visibleOptions: [],
         isDirty: false,
-        data: this.value,
+        data: cloneDeep(this.value),
         inputValue: false
       }
     },
@@ -233,6 +233,10 @@
         this.inputValue = false;
         await this.$nextTick();
         this.data = cloneDeep(this.value);
+      },
+      onBeforeShow(){
+	this.isDirty = this.validate ? this.validate.$dirty: false; // dirty state
+	!this.inputValue && merge(this.data, cloneDeep(this.initialValue), cloneDeep(this.value)); // nested obj val
       },
       async onShow() {
         await this.$nextTick();
