@@ -235,7 +235,7 @@
         this.data = cloneDeep(this.value);
       },
       onBeforeShow(){
-	this.isDirty = this.validate ? this.validate.$dirty: false; // dirty state
+	this.isDirty = Object.keys(this.value).some(fld => get(this.validate, `${fld}.$dirty`)); // dirty state
 	!this.inputValue && merge(this.data, cloneDeep(this.initialValue), cloneDeep(this.value)); // nested obj val
       },
       async onShow() {
