@@ -45,7 +45,7 @@
 
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @before-show="onBeforeShow" @show="onShow" @hide="onHide">
+    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @before-show="onBeforeShow" @show="onShow" @hide="onHide" persistent>
 
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
         <db-form

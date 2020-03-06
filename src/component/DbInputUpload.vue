@@ -67,7 +67,7 @@
 
             <q-item-section v-if="file.__img" thumbnail>
               <q-btn size="lg" flat dense>
-                <db-img :url="file.__img.src" contain height="56px" width="56px" />
+                <db-img :url="file.__img.src" contain height="56px" width="56px" @error="file.__status='failed'" />
               </q-btn>
             </q-item-section>
 

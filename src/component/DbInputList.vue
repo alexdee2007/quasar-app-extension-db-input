@@ -38,7 +38,7 @@
 
     </q-uploader>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" @before-show="setDirty">
+    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" @before-show="setDirty" persistent>
 
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
         <db-form
@@ -210,7 +210,7 @@
       setDirty() {
         this.isDirty = this.validate ? get(this.validate, ['$each', this.formIndex, '$error']) : false
       },
-      async onHide() {
+      async onHide(evt) {
         this.data = cloneDeep(this.initialValue);
       },
       async onShow() {
