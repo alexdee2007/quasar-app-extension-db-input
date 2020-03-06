@@ -105,6 +105,7 @@
 </template>
 
 <script>
+  import { isEqual } from 'lodash';
   import dbInputMixin from '../mixins/db-input';
   import uploadMixin from '../mixins/upload';
 
@@ -130,10 +131,10 @@
       }
     },
     watch: {
-      value(val) {
-        if (JSON.stringify(val.map(v => v.fileName)) !== JSON.stringify(this.$refs.uploader.files.map(v => v.__fullName))) {
+      value(val, oldVal) {
+        if (!isEqual(val, oldVal)/* && JSON.stringify(val.map(v => v.fileName)) !== JSON.stringify(this.$refs.uploader.files.map(v => v.__fullName))*/) {
           this.$refs.uploader.reset();
-          Promise.all(this.value.map((val, index) => this.pushFileToList(val.fileName, index, this.$refs.uploader.files)));
+          Promise.all(val.map((v, index) => this.pushFileToList(v.fileName, index, this.$refs.uploader.files)));
         }
       }
     },
@@ -150,6 +151,12 @@
         info.files.forEach(file => {
           this.value.push({fileName: file.__fullName});
         });
+      }
+    },
+    mounted() {
+      if (this.value) {
+        this.$refs.uploader.reset();
+        Promise.all(this.value.map((val, index) => this.pushFileToList(val.fileName, index, this.$refs.uploader.files)));
       }
     }
   }
