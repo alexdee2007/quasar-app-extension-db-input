@@ -73,9 +73,9 @@
             </q-page>
           </q-page-container>
 
-          <q-footer reveal elevated>
+          <q-footer elevated>
             <slot name="footer">
-              <q-toolbar class="bg-grey-9 text-white fixed-bottom" style="z-index:9999;">
+              <q-toolbar class="bg-grey-9 text-white">
                 <q-space />
                 <q-btn v-if="showCancelButton" label="Відмінити" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
                   <q-tooltip>Відмінити зміни</q-tooltip>
