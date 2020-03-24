@@ -19,19 +19,23 @@
       <template v-slot:list="scope">
         <slot name="list" :value="value" :validate="validate" :edit="edit" :remove="remove" :scope="scope">
           <q-list separator>
-            <q-item v-for="(row, index) in value" clickable class="text-black" :key="`input-list-${index}`" @click="edit(index)">
-              <q-item-section side v-if="validate.$each && validate.$each[index] && validate.$each[index].$error">
-                <q-icon color="negative" :name="scope.$q.iconSet.field.error" />
-              </q-item-section>
-              <slot name="list-section" :index="index" :row="row">
-                <q-item-section>{{ displayedValue(row) }}</q-item-section>
-              </slot>
-              <q-item-section side>
-                <q-btn ize="12px" flat dense round icon="delete" @click.stop.prevent="remove(index)">
-                  <q-tooltip>Видалити</q-tooltip>
-                </q-btn>
-              </q-item-section>
-            </q-item>
+            <template v-for="(row, index) in value">
+              <q-item v-if="!filterList || filterList(row) === true" clickable class="text-black" :key="`input-list-${index}`" @click="edit(index)">
+
+                <q-item-section side v-if="validate.$each && validate.$each[index] && validate.$each[index].$error">
+                  <q-icon color="negative" :name="scope.$q.iconSet.field.error" />
+                </q-item-section>
+                <slot name="list-section" :index="index" :row="row">
+                  <q-item-section>{{ displayedValue(row) }}</q-item-section>
+                </slot>
+                <q-item-section side>
+                  <q-btn ize="12px" flat dense round icon="delete" @click.stop.prevent="remove(index)">
+                    <q-tooltip>Видалити</q-tooltip>
+                  </q-btn>
+                </q-item-section>
+
+              </q-item>
+            </template>
           </q-list>
         </slot>
       </template>
@@ -153,7 +157,7 @@
         type: String,
         required: true
       },
-
+      filterList: Function,
       initialValue: {
         type: Object,
         default: () => ({})
