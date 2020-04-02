@@ -1,6 +1,5 @@
 import { get } from 'lodash';
 import {lookup as mimeLookup} from 'mime-types';
-import minioApi from 'src/api/minio';
 import download from '../utils/download-file';
 
 export default {
@@ -17,7 +16,7 @@ export default {
           return false;
         }
         if (!file.__presignedUrl) {
-          file.__presignedUrl = await minioApi.getPresignedUrlForGet(file.__fullName);
+          file.__presignedUrl = await this.$api.minio.getPresignedUrlForGet(file.__fullName);
         }
         download(file.__presignedUrl, file.name);
 
@@ -34,7 +33,7 @@ export default {
           return false;
         }
         if (!file.__presignedUrl) {
-          file.__presignedUrl = await minioApi.getPresignedUrlForGet(file.__fullName);
+          file.__presignedUrl = await this.$api.minio.getPresignedUrlForGet(file.__fullName);
         }
         this.$q.dialog({
           component: 'db-pdf-viewer',
@@ -51,7 +50,7 @@ export default {
     async pushFileToList(fullName, index, list, payload, noPresignedUrl) {
       try {
         this.inProgress = true;
-        const url = noPresignedUrl ? undefined : await minioApi.getPresignedUrlForGet(fullName);
+        const url = noPresignedUrl ? undefined : await this.$api.minio.getPresignedUrlForGet(fullName);
         const fileName = fullName.split('/').pop();
         const mimeType = mimeLookup(fileName);
         const file = {
@@ -85,7 +84,7 @@ export default {
       try {
         if (files.length === 1) {
 
-          const {url, fileName} = await minioApi.getPresignedUrlForPut(this.folder, files[0].name);
+          const {url, fileName} = await this.$api.minio.getPresignedUrlForPut(this.folder, files[0].name);
           const mimeType = mimeLookup(files[0].name);
 
           if (mimeType.toUpperCase() === 'APPLICATION/PDF') {

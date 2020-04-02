@@ -44,7 +44,6 @@
 
 <script>
 
-  import dictApi from 'src/api/dict';
   import DbInputMixin from '../mixins/db-input';
   import DbInputTargetMixin from '../mixins/db-input-target';
   import updateMenuMixin from '../mixins/update-menu';
@@ -103,7 +102,7 @@
           }
 
           if (this.remote) {
-            const dict = await dictApi.chunk(this.dictName, val);
+            const dict = await this.$api.dict.chunk(this.dictName, val);
             return update(() => {
               this.visibleOptions = dict.node ? dict.node.map(obj => obj.value) : null;
             });

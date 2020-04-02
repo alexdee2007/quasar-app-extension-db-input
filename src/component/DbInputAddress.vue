@@ -45,7 +45,6 @@
 
 <script>
 
-  import visicomApi from 'src/api/visicom';
   import DbInputMixin from '../mixins/db-input';
   import DbInputTargetMixin from '../mixins/db-input-target';
   import updateMenuMixin from '../mixins/update-menu';
@@ -95,7 +94,7 @@
             return abort();
           }
 
-          const obj = await visicomApi.search(this.category, this.pref + val);
+          const obj = await this.$api.visicom.search(this.category, this.pref + val);
           let options = [];
 
           if (obj && obj.type === 'FeatureCollection') {
