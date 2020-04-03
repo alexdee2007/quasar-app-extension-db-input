@@ -1,6 +1,6 @@
 import { get, mapValues } from 'lodash';
 import { singularize } from 'inflection';
-import models from 'src/models';
+import * as models from 'src/models';
 
 const getFieldName = (fieldPath) => {
   const match = fieldPath.match(/(.*)\[(\d*)\]\.([0-9A-Za-z]+)$/);
