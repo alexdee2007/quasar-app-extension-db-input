@@ -13,6 +13,10 @@ export const getErrorLabel = function (obj = this.validate) {
 
 export const messages = {
   required: () => 'Необхідно заповнити',
+  decimal: () => 'Некоректне число',
+  email: () => 'Некоректний email',
+  ipAddress: () => 'Некоректна IP-адреса',
+  macAddress: () => 'Некоректна MAC-адреса',
   sameAsPassword: () => 'Паролі не співпадають',
   minLength: (params) => {
     return `Мінімум символів - ${params.min}`
