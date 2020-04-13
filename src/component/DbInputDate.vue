@@ -37,6 +37,7 @@
     bottom-slots
     v-bind:filled="!classicStyle"
     dense
+    debounce="100"
     lazy-rules
     v-bind="$props"
     v-bind:class="[classObj, `db-input-${type}`]"
@@ -111,7 +112,7 @@
         this.$emit('input', this.multiple
             ? val.length ? val : null
             : val);
-        //!this.multiple && this.$refs.input.resetValidation();
+        !this.multiple && this.$refs.input.resetValidation();
       },
       autocompleteDate(val) {
         if (moment(val, this.type === 'datetime' ? 'DD.MM.YYYY HH:mm:ss' : 'DD.MM.YYYY', true).isValid()) {
@@ -124,11 +125,13 @@
       },
       onBlurInput(evt) {
         let value = this.autocompleteDate(evt.target.value);
-        this.$emit('input', value === false ? evt.target.value : value);
+        value !== false && this.$emit('input', value);
       },
       onBlurTarget(evt) {
         let value = this.autocompleteDate(evt.target.value);
-        this.$refs.input.inputValue = value === false ? evt.target.value : value;
+        if (value !== false) {
+          this.$refs.input.inputValue = value;
+        }
       },
       onNewValue(val, done) {
         val = this.autocompleteDate(val);
