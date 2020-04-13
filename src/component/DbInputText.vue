@@ -13,6 +13,7 @@
     multiple
     v-bind="$props"
     v-bind:class="classObj"
+    v-bind:input-class="inputClassObj"
     v-bind:error="error.state"
     v-bind:error-message="error.label"
     v-bind:hint="hintLabel"
@@ -43,6 +44,7 @@
     :debounce="debounce || 100"
     v-bind="$props"
     v-bind:class="classObj"
+    v-bind:input-class="inputClassObj"
     v-bind:type="type"
     v-bind:error="error.state"
     v-bind:error-message="error.label"

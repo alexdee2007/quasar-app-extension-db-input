@@ -13,6 +13,7 @@
     v-bind="$props"
     v-bind:hide-dropdown-icon="hideDropdownIcon"
     v-bind:class="classObj"
+    v-bind:input-class="inputClassObj"
     v-bind:hide-selected="!multiple"
     v-bind:loading="loading"
     v-bind:error="error.state"

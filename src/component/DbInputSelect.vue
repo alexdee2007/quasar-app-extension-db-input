@@ -14,6 +14,7 @@
     v-bind="$props"
     v-bind:options-dense="optionsDense"
     v-bind:class="classObj"
+    v-bind:input-class="inputClassObj"
     v-bind:option-disable="notDisableOptions ? null : 'dsbl'"
     v-bind:hide-selected="!multiple"
     v-bind:value="option"

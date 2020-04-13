@@ -63,7 +63,11 @@ export default {
     classObj() {
       return {
         'db-input': true,
-        'db-input--description': this.description,
+        'db-input--description': this.description
+      };
+    },
+    inputClassObj() {
+      return {
         'text-uppercase': this.upperCase
       };
     }

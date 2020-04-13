@@ -11,6 +11,7 @@
     :fill-input="typeof filter === 'function'"
     :hide-selected="typeof filter === 'function'"
     :class="classObj"
+    :input-class="inputClassObj"
     :error="error.state"
     :error-message="error.label"
     :hint="hintLabel"

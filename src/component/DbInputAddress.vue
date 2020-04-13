@@ -13,6 +13,7 @@
     dense
     hide-dropdown-icon
     v-bind:class="classObj"
+    :input-class="inputClassObj"
     hide-selected
     v-bind="$props"
     v-bind:value="value"
