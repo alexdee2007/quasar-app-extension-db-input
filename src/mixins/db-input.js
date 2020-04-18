@@ -50,9 +50,16 @@ export default {
       return typeof this.dict === 'string' ? this.dict : undefined;
     },
     validate() {
-      return this.validation || (this.form
-          ? get(this.form.$v, this.validatePath.split('.').length === 1 ? 'value' : this.validatePath.replace(RegExp(`^${this.form.modelName}`), 'value'), {})
-          : {});
+      //console.log(this.fieldPath, this.validatePath, this, this.form, this.form.value, this.form.value.$validate);
+
+      //console.log(get(this.form.value, this.fieldPath.replace(RegExp(`^${this.form.value.$options.name}\.`), '')).$validate);
+      return {};
+      /*
+       return this.validation || (this.form
+       ? get(this.form.$v, this.validatePath.split('.').length === 1 ? 'value' : this.validatePath.replace(RegExp(`^${this.form.modelName}`), 'value'), {})
+       : {});
+       *
+       */
     },
     error() {
       return {
