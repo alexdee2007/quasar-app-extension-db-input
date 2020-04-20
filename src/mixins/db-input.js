@@ -2,12 +2,16 @@ import { get } from 'lodash';
 import { getErrorLabel } from '../utils/validations';
 
 export default {
-  inject: {
-    form: {default: false}
-  },
+  //inject: {
+  //   form: {default: false}
+  // },
   props: {
     value: [String, Array, Number, Object],
     rules: Array,
+    validate: {
+      type: Object,
+      default: () => ({})
+    },
     defaultValue: [String, Array],
     label: String,
     description: String,
@@ -49,22 +53,10 @@ export default {
     dictName() {
       return typeof this.dict === 'string' ? this.dict : undefined;
     },
-    validate() {
-      //console.log(this.fieldPath, this.validatePath, this, this.form, this.form.value, this.form.value.$validate);
-
-      //console.log(get(this.form.value, this.fieldPath.replace(RegExp(`^${this.form.value.$options.name}\.`), '')).$validate);
-      return {};
-      /*
-       return this.validation || (this.form
-       ? get(this.form.$v, this.validatePath.split('.').length === 1 ? 'value' : this.validatePath.replace(RegExp(`^${this.form.modelName}`), 'value'), {})
-       : {});
-       *
-       */
-    },
     error() {
       return {
-        state: this.validate && typeof this.validate === 'object' ? this.validate.$error : false,
-        label: this.validate && typeof this.validate === 'object' ? getErrorLabel.call(this, this.validate) : undefined
+        state: !!this.validate.$error,
+        label: getErrorLabel.call(this, this.validate)
       };
     },
     classObj() {

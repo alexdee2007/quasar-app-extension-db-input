@@ -2,10 +2,7 @@ import Vue from 'vue';
 import { get, findLastIndex } from 'lodash';
 
 export default {
-  functional: true,
-  inject: {
-    form: {default: false}
-  },
+  //functional: true,
   render(createElement, context) {
 
     const fieldPath = context.data.model.expression;
