@@ -54,10 +54,7 @@ export default {
       return typeof this.dict === 'string' ? this.dict : undefined;
     },
     error() {
-      return {
-        state: !!this.validate.$error,
-        label: getErrorLabel.call(this, this.validate)
-      };
+      return {state: this.validate.$error, label: getErrorLabel.call(this, this.validate)};
     },
     classObj() {
       return {
@@ -120,6 +117,6 @@ export default {
   beforeDestroy() {
     this.$refs.input && this.$refs.input.$off();
   },
-  validations: {
-  }
+//  validations: {
+//  }
 }
