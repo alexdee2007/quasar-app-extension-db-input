@@ -234,6 +234,7 @@
         this.inputValue = false;
         await this.$nextTick();
         this.data = cloneDeep(this.value);
+	 this.$emit('hide');
       },
       onBeforeShow(){
 	this.isDirty = Object.keys(this.value).some(fld => get(this.validate, `${fld}.$dirty`)); // dirty state

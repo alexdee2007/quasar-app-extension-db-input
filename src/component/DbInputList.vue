@@ -216,6 +216,7 @@
       },
       async onHide(evt) {
         this.data = cloneDeep(this.initialValue);
+        this.$emit('hide');
       },
       async onShow() {
         await this.$nextTick();
