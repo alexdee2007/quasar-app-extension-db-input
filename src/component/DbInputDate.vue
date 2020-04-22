@@ -38,7 +38,7 @@
     bottom-slots
     v-bind:filled="!classicStyle"
     dense
-    :debounce="debounce || 100"
+    :debounce="debounce || 300"
     lazy-rules
     v-bind="$props"
     v-bind:class="[classObj, `db-input-${type}`]"

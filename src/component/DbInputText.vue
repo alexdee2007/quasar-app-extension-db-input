@@ -41,7 +41,7 @@
     bottom-slots
     v-bind:filled="!classicStyle"
     dense
-    :debounce="debounce || 100"
+    :debounce="debounce || 300"
     v-bind="$props"
     v-bind:class="classObj"
     v-bind:input-class="inputClassObj"
