@@ -1,10 +1,8 @@
 import { get } from 'lodash';
-import { getErrorLabel } from '../utils/validations';
+import { getErrorLabel } from '../utils/validators';
 
 export default {
-  //inject: {
-  //   form: {default: false}
-  // },
+    
   props: {
     value: [String, Array, Number, Object],
     rules: Array,
@@ -29,17 +27,7 @@ export default {
     readonly: Boolean,
     multiple: Boolean,
     autofocus: Boolean,
-    fieldName: String,
-    fieldPath: String,
-    validatePath: String,
     classicStyle: Boolean,
-    hideBottomSpace: Boolean,
-    validation: Object,
-    prefix: String,
-    suffix: String,
-    placeholder: String,
-    inputStyle: [String, Array, Object],
-    inputClass: [String, Array, Object],
     debounce: [String, Number],
     language: {
       type: String,

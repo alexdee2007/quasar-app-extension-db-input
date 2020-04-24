@@ -11,7 +11,7 @@
     fill-input
     dense
     behavior="menu"
-    v-bind="$props"
+    v-bind="{...$props, ...$attrs}"
     v-bind:options-dense="optionsDense"
     v-bind:class="classObj"
     v-bind:input-class="inputClassObj"

@@ -27,7 +27,7 @@
     >
 
     <template v-slot:selected-item="scope">
-      <span class="ellipsis">{{ isEmpty ? '' : displayedValue(scope.opt) }}</span>
+      <span class="ellipsis">{{ isEmpty ? '' : typeof displayedValue === 'function' ? displayedValue(scope.opt): displayedValue }}</span>
     </template>
 
     <template v-slot:append>
@@ -46,17 +46,11 @@
 
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @before-show="onBeforeShow" @show="onShow" @hide="onHide" persistent>
-
+    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @before-show="onBeforeShow" @show="onShow" @hide="onHide" persistent @before-hide="onBeforeHide">
+      <!--
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
         <db-form
-          :model-name="modelName"
-          :value.sync="data"
-          :initial-value="initialValue"
-          :is-dirty="isDirty"
-          ref="form"
-	  :before-submit="beforeSubmit"
-          @submit="onSubmit"
+          v-model="value"
           :autofocus="!inputValue"
           >
           <q-header reveal elevated>
@@ -70,7 +64,7 @@
 
           <q-page-container>
             <q-page padding>
-              <slot :data="data"></slot>
+              <slot></slot>
             </q-page>
           </q-page-container>
 
@@ -92,16 +86,14 @@
           </q-footer>
         </db-form>
       </q-layout>
-
-      <q-card v-else style="max-width: 1280px;" :style="layoutStyle">
+      -->
+      <q-card style="max-width: 1280px;" :style="layoutStyle">
 
         <db-form
-          :model-name="modelName"
-          :value.sync="data"
-          :initial-value="initialValue"
-          :is-dirty="isDirty"
+          v-model="value"
           ref="form"
-	  :before-submit="beforeSubmit"
+          :before-submit="beforeSubmit"
+          :save-on-submit="saveOnSubmit"
           @submit="onSubmit"
           :autofocus="!inputValue"
           >
@@ -115,9 +107,7 @@
           <q-separator />
 
           <q-card-section>
-
-            <slot :data="data"></slot>
-
+            <slot />
           </q-card-section>
 
           <q-separator />
@@ -162,11 +152,7 @@
         type: Object,
         default: () => ({})
       },
-      modelName: {
-        type: String,
-        required: true
-      },
-      initialValue: {
+      defaultValue: {
         type: Object,
         default: () => ({})
       },
@@ -177,10 +163,10 @@
         default: true
       },
       displayedValue: {
-        type: Function,
-        required: true
+        type: [Function, String]
       },
       beforeSubmit: Function,
+      saveOnSubmit: Boolean,
       clearData: {
         type: Object,
         default: () => ({})
@@ -194,14 +180,6 @@
       require: Boolean,
       filter: Function
     },
-    watch: {
-      value: {
-        handler(val) {
-          this.data = cloneDeep(val);
-        },
-        deep: true
-      }
-    },
     computed: {
       layoutStyle() {
         return this.dialogMaximized ? null : {width: this.dialogWidth};
@@ -210,12 +188,12 @@
         return this.maximized || this.$q.screen.lt.md
       },
       isEmpty() {
-        return Object.keys(this.value).length === 0 || JSON.stringify(this.initialValue) === JSON.stringify(this.value);
+        return false;// Object.keys(this.value).length === 0 || JSON.stringify(this.initialValue) === JSON.stringify(this.value);
       },
       error() {
         return {
-          state: this.require && this.isEmpty && get(this.validation || this.form.$v, '$dirty') ? true : Object.keys(this.value).some(fld => get(this.validate, `${fld}.$error`)),
-          label: this.require && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки'
+          state: false,//this.require && this.isEmpty && get(this.validation || this.form.$v, '$dirty') ? true : Object.keys(this.value).some(fld => get(this.validate, `${fld}.$error`)),
+          label: ''//this.require && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки'
         };
       }
     },
@@ -225,7 +203,7 @@
         clearable: false,
         visibleOptions: [],
         isDirty: false,
-        data: cloneDeep(this.value),
+        //data: cloneDeep(this.value),
         inputValue: false
       }
     },
@@ -233,20 +211,23 @@
       async onHide() {
         this.inputValue = false;
         await this.$nextTick();
-        this.data = cloneDeep(this.value);
-	 this.$emit('hide');
+        //this.data = cloneDeep(this.value);
+        this.$emit('hide');
       },
-      onBeforeShow(){
-	this.isDirty = Object.keys(this.value).some(fld => get(this.validate, `${fld}.$dirty`)); // dirty state
-	!this.inputValue && merge(this.data, cloneDeep(this.initialValue), cloneDeep(this.value)); // nested obj val
+      onBeforeHide() {
+        this.value.$isChanged && this.value.$rollback();
+      },
+      onBeforeShow() {
+        // this.isDirty = Object.keys(this.value).some(fld => get(this.validate, `${fld}.$dirty`)); // dirty state
+        // !this.inputValue && merge(this.data, cloneDeep(this.initialValue), cloneDeep(this.value)); // nested obj val
       },
       async onShow() {
-        await this.$nextTick();
-        this.$refs.form.loadedValue = cloneDeep(this.value);
+        //await this.$nextTick();
+        //this.$refs.form.loadedValue = cloneDeep(this.value);
       },
       async onSubmit() {
-        this.$emit('input', this.data);
-        await this.$nextTick();
+        // this.$emit('input', this.data);
+        // await this.$nextTick();
         this.dialog = false;
       },
       cancel() {
@@ -284,6 +265,9 @@
           this.clearable = false;
         }
       }
+    },
+    mounted() {
+      console.log(this.value);
     }
   }
 </script>

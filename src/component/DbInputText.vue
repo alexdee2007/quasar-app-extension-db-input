@@ -11,7 +11,7 @@
     dense
     hide-dropdown-icon
     multiple
-    v-bind="$props"
+    v-bind="{...$props, ...$attrs}"
     v-bind:class="classObj"
     v-bind:input-class="inputClassObj"
     v-bind:error="error.state"
@@ -42,7 +42,7 @@
     v-bind:filled="!classicStyle"
     dense
     :debounce="debounce || 300"
-    v-bind="$props"
+    v-bind="{...$props, ...$attrs}"
     v-bind:class="classObj"
     v-bind:input-class="inputClassObj"
     v-bind:type="type"

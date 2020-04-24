@@ -10,7 +10,7 @@
     fill-input
     dense
     options-dense
-    v-bind="$props"
+    v-bind="{...$props, ...$attrs}"
     v-bind:hide-dropdown-icon="hideDropdownIcon"
     v-bind:class="classObj"
     v-bind:input-class="inputClassObj"

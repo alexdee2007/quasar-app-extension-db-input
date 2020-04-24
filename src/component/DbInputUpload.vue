@@ -5,7 +5,7 @@
       auto-upload
       url="localhost"
       :style="{width,height}"
-      v-bind="$props"
+      v-bind="{...$props, ...$attrs}"
       :color="error.state ? 'negative': 'primary'"
       ::max-file-size="5242880"
       :factory="factoryFn"
@@ -116,7 +116,6 @@
       label: String,
       value: Array,
       folder: String,
-      validatePath: String,
       height: {
         type: String,
         default: '220px'
