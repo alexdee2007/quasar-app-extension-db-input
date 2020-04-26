@@ -65,7 +65,7 @@
 
           <q-page-container>
             <q-page padding>
-              <slot :data="data"></slot>
+              <component :is="component" v-bind="{[value.$options.name]: value[formIndex]}" />
             </q-page>
           </q-page-container>
 
@@ -110,7 +110,7 @@
 
           <q-card-section>
 
-            <slot :data="data"></slot>
+            <component :is="component" v-bind="{[value.$options.name]: value[formIndex]}" />
 
           </q-card-section>
 
@@ -148,15 +148,12 @@
     name: 'DbInputList',
     mixins: [DbInputMixin],
     props: {
-
+      component: [Function, Object],
       value: {
         type: Array,
         default: () => []
       },
-      modelName: {
-        type: String,
-        required: true
-      },
+
       filterList: Function,
       initialValue: {
         type: Object,

@@ -29,9 +29,9 @@ export default {
   render(createElement) {
 
     const attrs = {
-      type: this.$field.type,
+      type: this.$field.type === 'model' ? (this.$field.relation === 'hasOne' ? 'extended' : 'list') : this.$field.type,
       validate: this.$validate,
-      label: this.$field.label,
+      label: this.$field.type === 'model' ? this.$field.model.title : this.$field.label,
       dict: this.$field.dict,
       pref: this.$field.pref,
       language: this.$field.language,

@@ -16,7 +16,7 @@
     :error-message="error.label"
     :hint="hintLabel"
     option-value="optionId"
-    :option-label="displayedValue"
+    :option-label="value.$label"
     :options="visibleOptions"
     :filled="!classicStyle"
     @filter="filterFn"
@@ -27,12 +27,12 @@
     >
 
     <template v-slot:selected-item="scope">
-      <span class="ellipsis">{{ isEmpty ? '' : typeof displayedValue === 'function' ? displayedValue(scope.opt): displayedValue }}</span>
+      <span class="ellipsis">{{ value.$label }} </span>
     </template>
 
     <template v-slot:append>
       <q-icon
-        v-if="(!$q.platform.is.desktop && !isEmpty && !disabled) || clearable"
+        v-if="(!$q.platform.is.desktop && !value.$isEmpty && !disabled) || clearable"
         name="cancel"
         color="primary"
         size="sm"
@@ -46,11 +46,15 @@
 
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @before-show="onBeforeShow" @show="onShow" @hide="onHide" persistent @before-hide="onBeforeHide">
-      <!--
+    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" persistent @before-hide="onBeforeHide">
+
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
         <db-form
           v-model="value"
+          ref="form"
+          :before-submit="beforeSubmit"
+          :save-on-submit="saveOnSubmit"
+          @submit="dialog = false"
           :autofocus="!inputValue"
           >
           <q-header reveal elevated>
@@ -64,7 +68,7 @@
 
           <q-page-container>
             <q-page padding>
-              <slot></slot>
+              <component :is="component" v-bind="{[value.$options.name]: value}" />
             </q-page>
           </q-page-container>
 
@@ -72,29 +76,29 @@
             <slot name="footer">
               <q-toolbar class="bg-grey-9 text-white">
                 <q-space />
-                <q-btn v-if="showCancelButton" label="Відмінити" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
-                  <q-tooltip>Відмінити зміни</q-tooltip>
+                <q-btn v-if="showCancelButton" label="Скасувати" flat @click="value.$rollback" class="on-left" :disable="!value.$isChanged">
+                  <q-tooltip v-if="value.$isChanged">Відмінити зміни</q-tooltip>
                 </q-btn>
-                <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
-                  <q-tooltip>Очистити форму</q-tooltip>
+                <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="value.$isEmpty">
+                  <q-tooltip v-if="!value.$isEmpty">Очистити форму</q-tooltip>
                 </q-btn>
-                <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
-                  <q-tooltip>Застосувати зміни</q-tooltip>
+                <q-btn label="Застосувати" type="submit" color="primary" :disable="!value.$isChanged" :autofocus="inputValue">
+                  <q-tooltip v-if="value.$isChanged"">Застосувати зміни</q-tooltip>
                 </q-btn>
               </q-toolbar>
             </slot>
           </q-footer>
         </db-form>
       </q-layout>
-      -->
-      <q-card style="max-width: 1280px;" :style="layoutStyle">
+
+      <q-card v-else style="max-width: 1280px;" :style="{width: dialogWidth}">
 
         <db-form
           v-model="value"
           ref="form"
           :before-submit="beforeSubmit"
           :save-on-submit="saveOnSubmit"
-          @submit="onSubmit"
+          @submit="dialog = false"
           :autofocus="!inputValue"
           >
           <slot name="header">
@@ -107,7 +111,7 @@
           <q-separator />
 
           <q-card-section>
-            <slot />
+            <component :is="component" v-bind="{[value.$options.name]: value}" />
           </q-card-section>
 
           <q-separator />
@@ -115,19 +119,20 @@
           <slot name="footer">
             <q-toolbar class="bg-grey-9 text-white" style="z-index:9999;">
               <q-space />
-              <q-btn v-if="showCancelButton" label="Скасувати" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
-                <q-tooltip>Відмінити зміни</q-tooltip>
+              <q-btn v-if="showCancelButton" label="Скасувати" flat @click="value.$rollback()" class="on-left" :disable="!value.$isChanged">
+                <q-tooltip v-if="value.$isChanged">Відмінити зміни</q-tooltip>
               </q-btn>
-              <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
-                <q-tooltip>Очистити форму</q-tooltip>
+              <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="value.$isEmpty">
+                <q-tooltip v-if="!value.$isEmpty">Очистити форму</q-tooltip>
               </q-btn>
-              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && ($refs.form.notChanged || $refs.form.isEmpty)" :autofocus="inputValue">
-                <q-tooltip>Застосувати зміни</q-tooltip>
+              <q-btn label="Застосувати" type="submit" color="primary" :disable="!value.$isChanged" :autofocus="inputValue">
+                <q-tooltip v-if="value.$isChanged"">Застосувати зміни</q-tooltip>
               </q-btn>
             </q-toolbar>
           </slot>
 
         </db-form>
+
       </q-card>
     </q-dialog>
 
@@ -137,7 +142,7 @@
 
 <script>
 
-  import { get, has, merge, cloneDeep } from 'lodash';
+  import { cloneDeep } from 'lodash';
   import DbInputMixin from '../mixins/db-input';
   import TooltipDescription from './TooltipDescription';
 
@@ -145,14 +150,11 @@
     name: 'DbInputExtended',
     mixins: [DbInputMixin],
     components: {
-      TooltipDescription
+      TooltipDescription,
     },
     props: {
+      component: [Function, Object],
       value: {
-        type: Object,
-        default: () => ({})
-      },
-      defaultValue: {
         type: Object,
         default: () => ({})
       },
@@ -162,39 +164,19 @@
         type: Boolean,
         default: true
       },
-      displayedValue: {
-        type: [Function, String]
-      },
       beforeSubmit: Function,
       saveOnSubmit: Boolean,
-      clearData: {
-        type: Object,
-        default: () => ({})
-      },
       dialogWidth: {
         type: String,
         default: '1280px'
       },
       label: String,
       maximized: Boolean,
-      require: Boolean,
       filter: Function
     },
     computed: {
-      layoutStyle() {
-        return this.dialogMaximized ? null : {width: this.dialogWidth};
-      },
       dialogMaximized() {
         return this.maximized || this.$q.screen.lt.md
-      },
-      isEmpty() {
-        return false;// Object.keys(this.value).length === 0 || JSON.stringify(this.initialValue) === JSON.stringify(this.value);
-      },
-      error() {
-        return {
-          state: false,//this.require && this.isEmpty && get(this.validation || this.form.$v, '$dirty') ? true : Object.keys(this.value).some(fld => get(this.validate, `${fld}.$error`)),
-          label: ''//this.require && this.isEmpty ? 'Необхідно заповнити' : 'Містить помилки'
-        };
       }
     },
     data() {
@@ -202,36 +184,20 @@
         dialog: false,
         clearable: false,
         visibleOptions: [],
-        isDirty: false,
-        //data: cloneDeep(this.value),
         inputValue: false
       }
     },
     methods: {
       async onHide() {
-        this.inputValue = false;
-        await this.$nextTick();
-        //this.data = cloneDeep(this.value);
+        this.value.$parent && (this.value.$parent.$options.state.active = true);
         this.$emit('hide');
       },
       onBeforeHide() {
         this.value.$isChanged && this.value.$rollback();
       },
-      onBeforeShow() {
-        // this.isDirty = Object.keys(this.value).some(fld => get(this.validate, `${fld}.$dirty`)); // dirty state
-        // !this.inputValue && merge(this.data, cloneDeep(this.initialValue), cloneDeep(this.value)); // nested obj val
-      },
       async onShow() {
-        //await this.$nextTick();
-        //this.$refs.form.loadedValue = cloneDeep(this.value);
-      },
-      async onSubmit() {
-        // this.$emit('input', this.data);
-        // await this.$nextTick();
-        this.dialog = false;
-      },
-      cancel() {
-        this.$refs.form.cancel();
+        this.value.$parent && (this.value.$parent.$options.state.active = false);
+        this.$emit('show');
       },
       async filterFn(val, update, abort) {
         try {
@@ -247,16 +213,17 @@
         }
       },
       onInput(val) {
-        this.data = cloneDeep(val);
+        Object.assign(this.value.$data, cloneDeep(val));
         this.inputValue = true;
         this.dialog = true;
       },
       clearValue() {
-        this.$emit('input', this.clearData);
+        this.value.$reset();
+        this.value.$commit();
         this.clearable = false;
       },
       mouseenter() {
-        if (this.$q.platform.is.desktop && !this.isEmpty && !this.disabled) {
+        if (this.$q.platform.is.desktop && !this.value.$isEmpty && !this.disabled) {
           this.clearable = true;
         }
       },
@@ -266,8 +233,8 @@
         }
       }
     },
-    mounted() {
-      console.log(this.value);
+    beforeDestroy() {
+      this.value.$parent && (this.value.$parent.$options.state.active = true);
     }
   }
 </script>
