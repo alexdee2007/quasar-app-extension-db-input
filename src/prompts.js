@@ -27,8 +27,8 @@ module.exports = function () {
           checked: true
         },
         {
-          name: 'extended',
-          value: 'extended',
+          name: 'model',
+          value: 'model',
           checked: true
         },
         {
@@ -36,8 +36,8 @@ module.exports = function () {
           value: 'address'
         },
         {
-          name: 'list',
-          value: 'list'
+          name: 'models',
+          value: 'models'
         },
         {
           name: 'upload',

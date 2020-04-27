@@ -9,8 +9,8 @@
             <div class="col">
               <div class="q-uploader__title">{{ label }}</div>
             </div>
-            <q-btn type="a" icon="add_box" round dense flat @click="add">
-              <q-tooltip>Додати</q-tooltip>
+            <q-btn type="a" icon="add_box" round dense flat @click="add" :disable="disabled">
+              <q-tooltip v-if="!disabled">Додати</q-tooltip>
             </q-btn>
           </div>
         </slot>
@@ -20,17 +20,17 @@
         <slot name="list" :value="value" :validate="validate" :edit="edit" :remove="remove" :scope="scope">
           <q-list separator>
             <template v-for="(row, index) in value">
-              <q-item v-if="!filterList || filterList(row) === true" clickable class="text-black" :key="`input-list-${index}`" @click="edit(index)">
+              <q-item v-if="!filterList || filterList(row) === true" :clickable="!disabled" class="text-black" :key="`input-list-${index}`" @click="edit(index)">
 
-                <q-item-section side v-if="validate.$each && validate.$each[index] && validate.$each[index].$error">
+                <q-item-section side v-if="!dialog && row.$validate.$error">
                   <q-icon color="negative" :name="scope.$q.iconSet.field.error" />
                 </q-item-section>
                 <slot name="list-section" :index="index" :row="row">
-                  <q-item-section>{{ displayedValue(row) }}</q-item-section>
+                  <q-item-section>{{ row.$label }}</q-item-section>
                 </slot>
                 <q-item-section side>
-                  <q-btn ize="12px" flat dense round icon="delete" @click.stop.prevent="remove(index)">
-                    <q-tooltip>Видалити</q-tooltip>
+                  <q-btn ize="12px" flat dense round icon="delete" @click.stop.prevent="remove(index)" :disable="disabled">
+                    <q-tooltip v-if="!disabled">Видалити</q-tooltip>
                   </q-btn>
                 </q-item-section>
 
@@ -42,17 +42,17 @@
 
     </q-uploader>
 
-    <q-dialog v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" @before-show="setDirty" persistent>
+    <q-dialog v-if="currentModel" v-model="dialog" ref="dialog" :maximized="dialogMaximized" @show="onShow" @hide="onHide" persistent @before-hide="onBeforeHide">
 
       <q-layout v-if="dialogMaximized" ref="layout" container view="hhh lpr fff" class="bg-white">
+
         <db-form
-          :model-name="modelName"
-          :value.sync="data"
-          :initial-value="initialValue"
-          :is-dirty="isDirty"
+          v-model="currentModel"
           ref="form"
+          :before-submit="beforeSubmit"
+          :save-on-submit="saveOnSubmit"
           @submit="onSubmit"
-          :autofocus="!inputValue"
+          autofocus
           >
           <q-header reveal elevated>
             <slot name="header">
@@ -65,7 +65,7 @@
 
           <q-page-container>
             <q-page padding>
-              <component :is="component" v-bind="{[value.$options.name]: value[formIndex]}" />
+              <component :is="component" v-bind="{[model.name]: currentModel, ...componentProps}" />
             </q-page>
           </q-page-container>
 
@@ -73,31 +73,31 @@
             <slot name="footer">
               <q-toolbar class="bg-grey-9 text-white">
                 <q-space />
-                <q-btn v-if="showCancelButton" label="Відмінити" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
-                  <q-tooltip>Відмінити зміни</q-tooltip>
+                <q-btn v-if="showCancelButton" label="Скасувати" flat @click="currentModel.$rollback()" class="on-left" :disable="!currentModel.$isChanged">
+                  <q-tooltip v-if="currentModel.$isChanged">Відмінити зміни</q-tooltip>
                 </q-btn>
-                <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
-                  <q-tooltip>Очистити форму</q-tooltip>
+                <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="currentModel.$isEmpty">
+                  <q-tooltip v-if="!currentModel.$isEmpty">Очистити форму</q-tooltip>
                 </q-btn>
-                <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
-                  <q-tooltip>Застосувати зміни</q-tooltip>
+                <q-btn label="Застосувати" type="submit" color="primary" :disable="!currentModel.$isChanged">
+                  <q-tooltip v-if="currentModel.$isChanged">Застосувати зміни</q-tooltip>
                 </q-btn>
               </q-toolbar>
             </slot>
           </q-footer>
         </db-form>
+
       </q-layout>
 
-      <q-card v-else style="max-width: 1280px;" :style="layoutStyle">
+      <q-card v-else style="max-width: 1280px;" :style="{width: dialogWidth}">
 
         <db-form
-          :model-name="modelName"
-          :value.sync="data"
-          :initial-value="initialValue"
-          :is-dirty="isDirty"
+          v-model="currentModel"
           ref="form"
+          :before-submit="beforeSubmit"
+          :save-on-submit="saveOnSubmit"
           @submit="onSubmit"
-          :autofocus="!inputValue"
+          autofocus
           >
           <slot name="header">
             <q-toolbar class="bg-primary text-white">
@@ -110,7 +110,7 @@
 
           <q-card-section>
 
-            <component :is="component" v-bind="{[value.$options.name]: value[formIndex]}" />
+            <component :is="component" v-bind="{[model.name]: currentModel, ...componentProps}" />
 
           </q-card-section>
 
@@ -119,20 +119,21 @@
           <slot name="footer">
             <q-toolbar class="bg-grey-9 text-white" style="z-index:9999;">
               <q-space />
-              <q-btn v-if="showCancelButton" label="Скасувати" flat @click="cancel" class="on-left" :disable="$refs.form && $refs.form.notChanged">
-                <q-tooltip>Відмінити зміни</q-tooltip>
+              <q-btn v-if="showCancelButton" label="Скасувати" flat @click="currentModel.$rollback()" class="on-left" :disable="!currentModel.$isChanged">
+                <q-tooltip v-if="currentModel.$isChanged">Відмінити зміни</q-tooltip>
               </q-btn>
-              <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="$refs.form && $refs.form.isEmpty">
-                <q-tooltip>Очистити форму</q-tooltip>
+              <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="currentModel.$isEmpty">
+                <q-tooltip v-if="!currentModel.$isEmpty">Очистити форму</q-tooltip>
               </q-btn>
-              <q-btn label="Застосувати" type="submit" color="primary" :disable="$refs.form && $refs.form.notChanged" :autofocus="inputValue">
-                <q-tooltip>Застосувати зміни</q-tooltip>
+              <q-btn label="Застосувати" type="submit" color="primary" :disable="!currentModel.$isChanged">
+                <q-tooltip v-if="currentModel.$isChanged">Застосувати зміни</q-tooltip>
               </q-btn>
             </q-toolbar>
           </slot>
 
         </db-form>
       </q-card>
+
     </q-dialog>
 
   </q-field>
@@ -141,33 +142,32 @@
 
 <script>
 
-  import { get, cloneDeep } from 'lodash';
   import DbInputMixin from '../mixins/db-input';
+  import { getErrorLabel } from '../utils/validators';
 
   export default {
-    name: 'DbInputList',
+    name: 'DbInputModels',
     mixins: [DbInputMixin],
     props: {
       component: [Function, Object],
+      componentProps: {
+        type: Object,
+        default: () => ({})
+      },
       value: {
         type: Array,
         default: () => []
       },
 
       filterList: Function,
-      initialValue: {
-        type: Object,
-        default: () => ({})
-      },
+      model: Function,
       disabled: Boolean,
       showCancelButton: Boolean,
+      beforeSubmit: Function,
+      saveOnSubmit: Boolean,
       showResetButton: {
         type: Boolean,
         default: true
-      },
-      displayedValue: {
-        type: Function,
-        default: () => ({})
       },
       height: {
         type: String,
@@ -186,12 +186,10 @@
     },
     data() {
       return {
-        data: this.initialValue,
-        isDirty: false,
         formIndex: 0,
         dialogTitle: '',
         dialog: false,
-        inputValue: false
+        currentModel: null
       }
     },
     watch: {
@@ -200,47 +198,60 @@
       }
     },
     computed: {
-      layoutStyle() {
-        return this.dialogMaximized ? null : {width: this.dialogWidth};
+      hasErrors() {
+        return !this.dialog && this.value.some(vm => vm.$validate.$error);
+      },
+      error() {
+        return {
+          state: this.validate.$error || this.hasErrors,
+          label: this.hasErrors ? 'Містить помилки' : getErrorLabel.call(this, this.validate)
+        }
       },
       dialogMaximized() {
         return this.maximized || this.$q.screen.lt.md
       }
     },
     methods: {
-      setDirty() {
-        this.isDirty = this.validate ? get(this.validate, ['$each', this.formIndex, '$error']) : false
+      onBeforeHide() {
+        if (this.formIndex === this.value.length) { // new model no submit
+          this.currentModel.$destroy();
+        } else if (this.currentModel.$isChanged) { // no changes
+          this.currentModel.$rollback();
+        }
       },
       async onHide(evt) {
-        this.data = cloneDeep(this.initialValue);
+        this.currentModel.$parent && (this.currentModel.$parent.$options.state.active = true);
         this.$emit('hide');
       },
       async onShow() {
-        await this.$nextTick();
-        this.$refs.form.loadedValue = cloneDeep(this.data);
+        this.currentModel.$parent && (this.currentModel.$parent.$options.state.active = false);
+        this.$emit('show');
       },
       async onSubmit() {
-        this.value.splice(this.formIndex, 1, this.data);
-        await this.$nextTick();
+        this.value.splice(this.formIndex, 1, this.currentModel);
         this.dialog = false;
-      },
-      cancel() {
-        this.$refs.form.cancel();
       },
       remove(index) {
         this.value.splice(index, 1);
       },
       add() {
-        this.dialogTitle = `${this.label} - додати`;
+        this.dialogTitle = `${this.model.title} - додати`;
         this.formIndex = this.value.length;
+        this.currentModel = new this.model(this.model.defaults(), this.$parent.$model);
         this.dialog = true;
       },
       edit(index) {
-        this.dialogTitle = `${this.label} - змінити`;
+        this.dialogTitle = `${this.model.title} - змінити`;
         this.formIndex = index;
-        this.data = this.value[index];
+        this.currentModel = this.value[index];
         this.dialog = true;
       }
+    },
+    beforeDestroy() {
+      if (this.currentModel && this.currentModel.$parent) {
+        this.currentModel.$parent.$options.state.active = true;
+      }
     }
+
   }
 </script>

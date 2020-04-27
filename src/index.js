@@ -20,11 +20,11 @@ function extendConf(conf, api) {
   if (api.prompts.types.includes('date')) {
     conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-date.js');
   }
-  if (api.prompts.types.includes('extended')) {
-    conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-extended.js');
+  if (api.prompts.types.includes('model')) {
+    conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-model.js');
   }
-  if (api.prompts.types.includes('list')) {
-    conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-list.js');
+  if (api.prompts.types.includes('models')) {
+    conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-models.js');
   }
   if (api.prompts.types.includes('select')) {
     conf.boot.push('~quasar-app-extension-db-input/src/boot/register-db-input-select.js');

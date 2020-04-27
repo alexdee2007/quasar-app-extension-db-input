@@ -19,6 +19,8 @@
     :option-label="value.$label"
     :options="visibleOptions"
     :filled="!classicStyle"
+    :disable="disabled"
+    :style="{opacity: 'initial !important'}"
     @filter="filterFn"
     @keyup.enter.native="dialog = true"
     @input="onInput"
@@ -41,7 +43,7 @@
         :tabindex="-1"
         @click="clearValue"
         />
-      <q-btn dense icon="edit" color="primary" size="sm" :tabindex="-1" @click="dialog = true" :disabled="disabled" />
+      <q-btn dense icon="edit" color="primary" size="sm" :tabindex="-1" @click="dialog = true" :disable="disabled" />
     </template>
 
     <tooltip-description v-if="description">{{ description }}</tooltip-description>
@@ -68,7 +70,7 @@
 
           <q-page-container>
             <q-page padding>
-              <component :is="component" v-bind="{[value.$options.name]: value}" />
+              <component :is="component" v-bind="{[value.$options.name]: value, ...componentProps}" />
             </q-page>
           </q-page-container>
 
@@ -79,7 +81,7 @@
                 <q-btn v-if="showCancelButton" label="Скасувати" flat @click="value.$rollback" class="on-left" :disable="!value.$isChanged">
                   <q-tooltip v-if="value.$isChanged">Відмінити зміни</q-tooltip>
                 </q-btn>
-                <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="value.$isEmpty">
+                <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="value.$isEmpty">
                   <q-tooltip v-if="!value.$isEmpty">Очистити форму</q-tooltip>
                 </q-btn>
                 <q-btn label="Застосувати" type="submit" color="primary" :disable="!value.$isChanged" :autofocus="inputValue">
@@ -111,7 +113,7 @@
           <q-separator />
 
           <q-card-section>
-            <component :is="component" v-bind="{[value.$options.name]: value}" />
+            <component :is="component" v-bind="{[value.$options.name]: value, ...componentProps}" />
           </q-card-section>
 
           <q-separator />
@@ -122,11 +124,11 @@
               <q-btn v-if="showCancelButton" label="Скасувати" flat @click="value.$rollback()" class="on-left" :disable="!value.$isChanged">
                 <q-tooltip v-if="value.$isChanged">Відмінити зміни</q-tooltip>
               </q-btn>
-              <q-btn v-if="showResetBuuton" label="Очистити" type="reset" flat class="on-left" :disable="value.$isEmpty">
+              <q-btn v-if="showResetButton" label="Очистити" type="reset" flat class="on-left" :disable="value.$isEmpty">
                 <q-tooltip v-if="!value.$isEmpty">Очистити форму</q-tooltip>
               </q-btn>
               <q-btn label="Застосувати" type="submit" color="primary" :disable="!value.$isChanged" :autofocus="inputValue">
-                <q-tooltip v-if="value.$isChanged"">Застосувати зміни</q-tooltip>
+                <q-tooltip v-if="value.$isChanged">Застосувати зміни</q-tooltip>
               </q-btn>
             </q-toolbar>
           </slot>
@@ -145,22 +147,27 @@
   import { cloneDeep } from 'lodash';
   import DbInputMixin from '../mixins/db-input';
   import TooltipDescription from './TooltipDescription';
+  import { getErrorLabel } from '../utils/validators';
 
   export default {
-    name: 'DbInputExtended',
+    name: 'DbInputModel',
     mixins: [DbInputMixin],
     components: {
       TooltipDescription,
     },
     props: {
       component: [Function, Object],
+      componentProps: {
+        type: Object,
+        default: () => ({})
+      },
       value: {
         type: Object,
         default: () => ({})
       },
       disabled: Boolean,
       showCancelButton: Boolean,
-      showResetBuuton: {
+      showResetButton: {
         type: Boolean,
         default: true
       },
@@ -177,6 +184,12 @@
     computed: {
       dialogMaximized() {
         return this.maximized || this.$q.screen.lt.md
+      },
+      error() {
+        return {
+          state: !this.dialog && (this.validate.$error || this.value.$validate.$error),
+          label: this.value.$validate.$error ? 'Містить помилки' : getErrorLabel.call(this, this.validate)
+        }
       }
     },
     data() {
@@ -238,3 +251,7 @@
     }
   }
 </script>
+
+<style>
+
+</style>

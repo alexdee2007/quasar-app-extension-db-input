@@ -29,9 +29,9 @@ export default {
   render(createElement) {
 
     const attrs = {
-      type: this.$field.type === 'model' ? (this.$field.relation === 'hasOne' ? 'extended' : 'list') : this.$field.type,
+      type: this.$field.type,
       validate: this.$validate,
-      label: this.$field.type === 'model' ? this.$field.model.title : this.$field.label,
+      label: this.$field.label,
       dict: this.$field.dict,
       pref: this.$field.pref,
       language: this.$field.language,
@@ -40,23 +40,24 @@ export default {
       multiple: this.$field.multiple,
       cascade: this.$field.cascade,
       remote: this.$field.remote,
+      model: this.$field.model,
+      field: this.$field,
       ...this.$attrs
-    }
-
-    const on = {
-      ...this.$listeners
     }
 
     const dbInputElement = attrs.type === 'select' ? 'db-input-select'
         : attrs.type === 'autocomplete' ? 'db-input-autocomplete'
         : attrs.type === 'address' ? 'db-input-address'
         : ['date', 'datetime'].includes(attrs.type) ? 'db-input-date'
-        : attrs.type === 'extended' ? 'db-input-extended'
+        : attrs.type === 'model' ? 'db-input-model'
         : attrs.type === 'upload' ? 'db-input-upload'
-        : attrs.type === 'list' ? 'db-input-list'
+        : attrs.type === 'models' ? 'db-input-models'
         : 'db-input-text';
 
-    return createElement(dbInputElement, {attrs, on}, this.$slots.default);
+
+    const children = Object.keys(this.$slots).map(slot => createElement('template', {slot}, this.$slots[slot]));
+
+    return createElement(dbInputElement, {attrs, on: this.$listeners, scopedSlots: this.$scopedSlots}, children);
 
   }
 
