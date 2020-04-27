@@ -16,7 +16,7 @@
     :error-message="error.label"
     :hint="hintLabel"
     option-value="optionId"
-    :option-label="value.$label"
+    :option-label="opt=>opt.$label"
     :options="visibleOptions"
     :filled="!classicStyle"
     :disable="disabled"
@@ -29,7 +29,7 @@
     >
 
     <template v-slot:selected-item="scope">
-      <span class="ellipsis">{{ value.$label }} </span>
+      <span class="ellipsis">{{ value.$label }}</span>
     </template>
 
     <template v-slot:append>
