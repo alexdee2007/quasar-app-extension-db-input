@@ -127,11 +127,12 @@
       accept: {
         type: String,
         default: 'image/*, .pdf'
-      }
+      },
+      model: Function
     },
     watch: {
       value(val, oldVal) {
-        if (!isEqual(val, oldVal)/* && JSON.stringify(val.map(v => v.fileName)) !== JSON.stringify(this.$refs.uploader.files.map(v => v.__fullName))*/) {
+        if (!isEqual(val, oldVal)) {
           this.$refs.uploader.reset();
           Promise.all(val.map((v, index) => this.pushFileToList(v.fileName, index, this.$refs.uploader.files)));
         }
@@ -148,15 +149,14 @@
       },
       onUploaded(info) {
         info.files.forEach(file => {
-          this.value.push({fileName: file.__fullName});
+          const model = new this.model({fileName: file.__fullName}, this.$parent.$model);
+          this.value.push(model);
         });
       }
     },
     mounted() {
-      if (this.value) {
-        this.$refs.uploader.reset();
-        Promise.all(this.value.map((val, index) => this.pushFileToList(val.fileName, index, this.$refs.uploader.files)));
-      }
+      this.$refs.uploader.reset();
+      Promise.all(this.value.map((val, index) => this.pushFileToList(val.fileName, index, this.$refs.uploader.files)));
     }
   }
 </script>
