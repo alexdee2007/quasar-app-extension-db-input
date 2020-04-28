@@ -16,7 +16,7 @@
     :error-message="error.label"
     :hint="hintLabel"
     option-value="optionId"
-    :option-label="opt=>opt.$label"
+    :option-label="filterLabel"
     :options="visibleOptions"
     :filled="!classicStyle"
     :disable="disabled"
@@ -34,7 +34,7 @@
 
     <template v-slot:append>
       <q-icon
-        v-if="(!$q.platform.is.desktop && !value.$isEmpty && !disabled) || clearable"
+        v-if="(!$q.platform.is.desktop && !isEmpty && !disabled) || clearable"
         name="cancel"
         color="primary"
         size="sm"
@@ -56,7 +56,8 @@
           ref="form"
           :before-submit="beforeSubmit"
           :save-on-submit="saveOnSubmit"
-          @submit="dialog = false"
+          @submit="onSubmit"
+          @reset="onReset"
           :autofocus="!inputValue"
           >
           <q-header reveal elevated>
@@ -100,7 +101,8 @@
           ref="form"
           :before-submit="beforeSubmit"
           :save-on-submit="saveOnSubmit"
-          @submit="dialog = false"
+          @submit="onSubmit"
+          @reset="onReset"
           :autofocus="!inputValue"
           >
           <slot name="header">
@@ -144,10 +146,11 @@
 
 <script>
 
-  import { cloneDeep } from 'lodash';
+  import { cloneDeep, isEqualWith } from 'lodash';
   import DbInputMixin from '../mixins/db-input';
   import TooltipDescription from './TooltipDescription';
   import { getErrorLabel } from '../utils/validators';
+  import { filterId, equalBlank } from 'db-model/utils';
 
   export default {
     name: 'DbInputModel',
@@ -161,10 +164,7 @@
         type: Object,
         default: () => ({})
       },
-      value: {
-        type: Object,
-        default: () => ({})
-      },
+      value: Object,
       disabled: Boolean,
       showCancelButton: Boolean,
       showResetButton: {
@@ -179,17 +179,29 @@
       },
       label: String,
       maximized: Boolean,
-      filter: Function
+      filter: Function,
+      filterLabel: {
+        type: Function
+      },
+      model: Function,
+      defaults: Object
     },
+
     computed: {
       dialogMaximized() {
         return this.maximized || this.$q.screen.lt.md
       },
+      defaultVal() {
+        return Object.assign(this.model.defaults(), this.defaults);
+      },
       error() {
         return {
           state: !this.dialog && (this.validate.$error || this.value.$validate.$error),
-          label: this.value.$validate.$error ? 'Містить помилки' : getErrorLabel.call(this, this.validate)
+          label: this.dialog ? '' : (this.value.$validate.$error ? 'Містить помилки' : getErrorLabel.call(this, this.validate))
         }
+      },
+      isEmpty() {
+        return this.value.$options.state.active ? isEqualWith(filterId(this.defaultVal), filterId(this.value.$filteredJsonData), equalBlank) : true;
       }
     },
     data() {
@@ -201,8 +213,18 @@
       }
     },
     methods: {
+      onSubmit() {
+        this.dialog = false;
+      },
+      onReset() {
+        Object.assign(this.value.$data, this.defaultVal);
+      },
+      updateInputValue(val) {
+        this.$refs.input.updateInputValue(this.filterLabel ? this.filterLabel(val) : val, true);
+      },
       async onHide() {
         this.value.$parent && (this.value.$parent.$options.state.active = true);
+        this.filter && this.updateInputValue(this.value.data);
         this.$emit('hide');
       },
       onBeforeHide() {
@@ -226,17 +248,18 @@
         }
       },
       onInput(val) {
-        Object.assign(this.value.$data, cloneDeep(val));
+        Object.assign(this.value.$data, this.defaultVal, cloneDeep(val));
         this.inputValue = true;
         this.dialog = true;
       },
       clearValue() {
         this.value.$reset();
+        Object.assign(this.value.$data, this.defaultVal);
         this.value.$commit();
         this.clearable = false;
       },
       mouseenter() {
-        if (this.$q.platform.is.desktop && !this.value.$isEmpty && !this.disabled) {
+        if (this.$q.platform.is.desktop && !this.isEmpty && !this.disabled) {
           this.clearable = true;
         }
       },
@@ -246,12 +269,20 @@
         }
       }
     },
+    beforeCreate() {
+      if (!this.$options.propsData.value) {
+        const defaultValue = Object.assign(this.$options.propsData.model.defaults(), this.$options.propsData.defaults);
+        const vm = new this.$options.propsData.model(defaultValue, this.$parent.$model);
+        this.$set(this.$options.propsData, 'value', vm);
+        this.$emit('input', vm);
+        this.$parent.$model.$commit();
+      }
+    },
+    mounted() {
+      this.filter && this.$watch('value.data', val => this.updateInputValue(val), {deep: true, immediate: true});
+    },
     beforeDestroy() {
       this.value.$parent && (this.value.$parent.$options.state.active = true);
     }
   }
 </script>
-
-<style>
-
-</style>

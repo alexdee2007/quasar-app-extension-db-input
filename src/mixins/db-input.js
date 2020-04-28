@@ -2,7 +2,7 @@ import { get } from 'lodash';
 import { getErrorLabel } from '../utils/validators';
 
 export default {
-    
+
   props: {
     value: [String, Array, Number, Object],
     rules: Array,
@@ -104,7 +104,6 @@ export default {
   },
   beforeDestroy() {
     this.$refs.input && this.$refs.input.$off();
-  },
-//  validations: {
-//  }
+  }
+  
 }
