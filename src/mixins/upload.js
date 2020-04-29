@@ -26,27 +26,6 @@ export default {
         this.inProgress = false;
       }
     },
-    async viewPdf(file) {
-      try {
-        this.$q.loading.show({message: 'Завантаження...'});
-        if (file.__status !== 'uploaded') {
-          return false;
-        }
-        if (!file.__presignedUrl) {
-          file.__presignedUrl = await this.$api.minio.getPresignedUrlForGet(file.__fullName);
-        }
-        this.$q.dialog({
-          component: 'db-pdf-viewer',
-          parent: this,
-          name: file.name,
-          src: file.__presignedUrl
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        this.$q.loading.hide();
-      }
-    },
     async pushFileToList(fullName, index, list, payload, noPresignedUrl) {
       try {
         this.inProgress = true;

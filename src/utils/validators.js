@@ -25,6 +25,7 @@ export const isArray = (value) => {
 }
 
 export const messages = {
+  isArray: () => 'Має бути списком',
   date: () => 'Неверний формат дати',
   datetime: () => 'Неверний формат дати-часу',
   required: () => 'Необхідно заповнити',

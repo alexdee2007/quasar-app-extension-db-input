@@ -270,7 +270,9 @@
       }
     },
     beforeCreate() {
+      console.log('CREATE BEF');
       if (!this.$options.propsData.value) {
+        console.log('CREATE BEF YES');
         const defaultValue = Object.assign(this.$options.propsData.model.defaults(), this.$options.propsData.defaults);
         const vm = new this.$options.propsData.model(defaultValue, this.$parent.$model);
         this.$set(this.$options.propsData, 'value', vm);

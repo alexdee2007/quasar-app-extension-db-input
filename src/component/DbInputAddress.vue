@@ -44,7 +44,7 @@
   import DbInputMixin from '../mixins/db-input';
   import DbInputTargetMixin from '../mixins/db-input-target';
   import updateMenuMixin from '../mixins/update-menu';
-  import { joinStrings } from '../utils/strings';
+  import { joinStrings } from 'db-model/utils';
   import TooltipDescription from './TooltipDescription';
 
   export default {

@@ -63,7 +63,7 @@
 <script>
 
   import moment from 'moment';
-  import { truncDateString } from '../utils/strings';
+  import { truncDateString } from 'db-model/utils';
   import DbInputMixin from '../mixins/db-input';
   import TooltipDescription from './TooltipDescription';
 
