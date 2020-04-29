@@ -158,7 +158,7 @@
         type: Array,
         default: () => []
       },
-
+      titleAsLabel: Boolean,
       filterList: Function,
       model: Function,
       disabled: Boolean,
@@ -235,13 +235,13 @@
         this.value.splice(index, 1);
       },
       add() {
-        this.dialogTitle = `${this.model.title} - додати`;
+        this.dialogTitle = `${this.titleAsLabel ? this.label : this.model.title} - додати`;
         this.formIndex = this.value.length;
         this.currentModel = new this.model(this.model.defaults(), this.$parent.$model);
         this.dialog = true;
       },
       edit(index) {
-        this.dialogTitle = `${this.model.title} - змінити`;
+        this.dialogTitle = `${this.titleAsLabel ? this.label : this.model.title} - змінити`;
         this.formIndex = index;
         this.currentModel = this.value[index];
         this.dialog = true;

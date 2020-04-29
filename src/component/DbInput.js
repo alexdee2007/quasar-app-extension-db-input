@@ -10,7 +10,7 @@ export default {
       return this.$vnode.data.model.expression.split('.');
     },
     $fieldName() {
-      return this.$path.slice(this.$modelIndex + 1).join('.').replace(/\[(\d*)\]$/,'');
+      return this.$path.slice(this.$modelIndex + 1).join('.');
     },
     $field() {
       return this.$model ? this.$model.$getField(this.$fieldName) : {};
