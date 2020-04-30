@@ -57,7 +57,6 @@
           :before-submit="beforeSubmit"
           :save-on-submit="saveOnSubmit"
           @submit="onSubmit"
-          @reset="onReset"
           :autofocus="!inputValue"
           >
           <q-header reveal elevated>
@@ -102,7 +101,6 @@
           :before-submit="beforeSubmit"
           :save-on-submit="saveOnSubmit"
           @submit="onSubmit"
-          @reset="onReset"
           :autofocus="!inputValue"
           >
           <slot name="header">
@@ -146,11 +144,11 @@
 
 <script>
 
-  import { cloneDeep, isEqualWith } from 'lodash';
+  import { cloneDeep, isEqualWith, mapValues } from 'lodash';
   import DbInputMixin from '../mixins/db-input';
   import TooltipDescription from './TooltipDescription';
   import { getErrorLabel } from '../utils/validators';
-  import { filterId, equalBlank } from 'db-model/utils';
+  import { filterServiceFields, equalBlank } from 'db-model/utils';
 
   export default {
     name: 'DbInputModel',
@@ -201,7 +199,7 @@
         }
       },
       isEmpty() {
-        return this.value.$options.state.active ? isEqualWith(filterId(this.defaultVal), filterId(this.value.$filteredJsonData), equalBlank) : true;
+        return this.value.$options.state.active ? isEqualWith(filterServiceFields(this.defaultVal), filterServiceFields(this.value.$filteredJsonData), equalBlank) : true;
       }
     },
     data() {
@@ -215,9 +213,6 @@
     methods: {
       onSubmit() {
         this.dialog = false;
-      },
-      onReset() {
-        Object.assign(this.value.$data, this.defaultVal);
       },
       updateInputValue(val) {
         this.$refs.input.updateInputValue(this.filterLabel ? this.filterLabel(val) : val, true);
@@ -234,6 +229,9 @@
         this.value.$parent && (this.value.$parent.$options.state.active = false);
         this.$emit('show');
       },
+      assignDefaults() {
+        Object.assign(this.value.$data, this.defaults);
+      },
       async filterFn(val, update, abort) {
         try {
           if (val.length < 1 || typeof this.filter === undefined) {
@@ -241,20 +239,20 @@
           }
           const options = await this.filter(val);
           return update(() => {
-            this.visibleOptions = options;
+            this.visibleOptions = Object.freeze(options);
           });
         } catch (err) {
           console.error(err);
         }
       },
       onInput(val) {
-        Object.assign(this.value.$data, this.defaultVal, cloneDeep(val));
+        this.value.$reset();
+        Object.assign(this.value.$data, cloneDeep(val));
         this.inputValue = true;
         this.dialog = true;
       },
-      clearValue() {
+      async clearValue() {
         this.value.$reset();
-        Object.assign(this.value.$data, this.defaultVal);
         this.value.$commit();
         this.clearable = false;
       },
@@ -270,9 +268,7 @@
       }
     },
     beforeCreate() {
-      console.log('CREATE BEF');
       if (!this.$options.propsData.value) {
-        console.log('CREATE BEF YES');
         const defaultValue = Object.assign(this.$options.propsData.model.defaults(), this.$options.propsData.defaults);
         const vm = new this.$options.propsData.model(defaultValue, this.$parent.$model);
         this.$set(this.$options.propsData, 'value', vm);
@@ -282,9 +278,11 @@
     },
     mounted() {
       this.filter && this.$watch('value.data', val => this.updateInputValue(val), {deep: true, immediate: true});
+      this.value.$on('reset', this.assignDefaults);
     },
     beforeDestroy() {
       this.value.$parent && (this.value.$parent.$options.state.active = true);
+      this.value.$off('reset', this.assignDefaults);
     }
   }
 </script>

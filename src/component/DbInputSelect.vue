@@ -58,7 +58,7 @@
 
 <script>
 
-  import { find } from 'lodash';
+  import { find, cloneDeep } from 'lodash';
   import { stopAndPrevent } from '../utils/events';
   import DbInputMixin from '../mixins/db-input';
   import DbInputTargetMixin from '../mixins/db-input-target';
@@ -110,6 +110,8 @@
 
         let options = this.asyncOptions ? this.asyncOptions
             : Array.isArray(this.dict) ? this.dict : this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] || null;
+
+        options = cloneDeep(options); // copy
 
         if (this.filterOptions) {
           options = options.filter(this.filterOptions);
@@ -184,9 +186,8 @@
 
         const opts = calc ? this.calculatedOptions : this.selectOptions;
 
-        this.visibleOptions = val === ''
-            ? (this.cascade ? this.calculatedOptions : this.selectOptions)
-            : (this.filter ? this.filter(opts, val.toLowerCase()) : this.filtering(opts, val.toLowerCase()));
+        this.visibleOptions = Object.freeze(val === '' ? (this.cascade ? this.calculatedOptions : this.selectOptions)
+            : (this.filter ? this.filter(opts, val.toLowerCase()) : this.filtering(opts, val.toLowerCase())));
 
       },
       onKeydown(evt) {
