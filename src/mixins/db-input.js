@@ -105,5 +105,5 @@ export default {
   beforeDestroy() {
     this.$refs.input && this.$refs.input.$off();
   }
-  
+
 }

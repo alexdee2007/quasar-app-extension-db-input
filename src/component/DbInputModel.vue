@@ -189,8 +189,8 @@
       dialogMaximized() {
         return this.maximized || this.$q.screen.lt.md
       },
-      defaultVal() {
-        return Object.assign(this.model.defaults(), this.defaults);
+      ownDefaults() {
+        return Object.assign(filterServiceFields(this.model.defaults()), this.defaults);
       },
       error() {
         return {
@@ -199,7 +199,7 @@
         }
       },
       isEmpty() {
-        return this.value.$options.state.active ? isEqualWith(filterServiceFields(this.defaultVal), filterServiceFields(this.value.$filteredJsonData), equalBlank) : true;
+        return this.value.$options.state.active ? isEqualWith(this.ownDefaults, this.value.$ownJsonData, equalBlank) : true;
       }
     },
     data() {

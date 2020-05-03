@@ -1,9 +1,35 @@
 import Vue from 'vue';
 import { get, findLastIndex } from 'lodash';
 
+const makeWatcher = (property) => {
+  return {
+    handler(val, oldVal) {
+      for (const attr in oldVal) {
+        if (!Object.prototype.hasOwnProperty.call(val, attr)) {
+          this.$delete(this.$data[property], attr)
+        }
+      }
+      for (const attr in val) {
+        this.$set(this.$data[property], attr, val[attr])
+      }
+    },
+    immediate: true
+  }
+}
+
 export default {
   inject: {
     form: {default: false}
+  },
+  data() {
+    return {
+      attrs$: {},
+      listeners$: {},
+    }
+  },
+  watch: {
+    $attrs: makeWatcher('attrs$'),
+    $listeners: makeWatcher('listeners$')
   },
   computed: {
     $path() {
@@ -42,7 +68,7 @@ export default {
       remote: this.$field.remote,
       model: this.$field.model,
       field: this.$field,
-      ...this.$attrs
+      ...this.attrs$
     }
 
     const dbInputElement = attrs.type === 'select' ? 'db-input-select'
@@ -56,8 +82,8 @@ export default {
 
 
     const children = Object.keys(this.$slots).map(slot => createElement('template', {slot}, this.$slots[slot]));
-
-    return createElement(dbInputElement, {attrs, on: this.$listeners, scopedSlots: this.$scopedSlots}, children);
+    console.log('RENDER ', this.$path);
+    return createElement(dbInputElement, {attrs, on: this.listeners$, scopedSlots: this.$scopedSlots}, children);
 
   }
 
