@@ -194,8 +194,8 @@
       },
       error() {
         return {
-          state: !this.dialog && (this.validate.$error || this.value.$validate.$error),
-          label: this.dialog ? '' : (this.value.$validate.$error ? 'Містить помилки' : getErrorLabel.call(this, this.validate))
+          state: !this.dialog && (this.validate.$error || this.value.$hasErrors),
+          label: this.dialog ? '' : (this.value.$hasErrors ? 'Містить помилки' : getErrorLabel.call(this, this.validate))
         }
       },
       isEmpty() {

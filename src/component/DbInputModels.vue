@@ -22,7 +22,7 @@
             <template v-for="(row, index) in value">
               <q-item v-if="!filterList || filterList(row) === true" :clickable="!disabled" class="text-black" :key="`input-list-${index}`" @click="edit(index)">
 
-                <q-item-section side v-if="!dialog && row.$validate.$error">
+                <q-item-section side v-if="!dialog && row.$hasErrors">
                   <q-icon color="negative" :name="scope.$q.iconSet.field.error" />
                 </q-item-section>
                 <slot name="list-section" :index="index" :row="row">
@@ -199,7 +199,7 @@
     },
     computed: {
       hasErrors() {
-        return !this.dialog && this.value.some(vm => vm.$validate.$error);
+        return !this.dialog && this.value.some(vm => vm.$hasErrors);
       },
       error() {
         return {

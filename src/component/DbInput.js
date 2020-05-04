@@ -48,7 +48,7 @@ export default {
       return get(this.form, this.$path.slice(0, this.$modelIndex + 1).join('.'));
     },
     $validate() {
-      return this.$model ? get(this.$model.$validate, this.$fieldName) : {};
+      return this.$model ? get(this.$model.$v, this.$fieldName) : {};
     }
   },
 
