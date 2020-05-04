@@ -80,11 +80,9 @@ export default {
         : attrs.type === 'models' ? 'db-input-models'
         : 'db-input-text';
 
-
     const children = Object.keys(this.$slots).map(slot => createElement('template', {slot}, this.$slots[slot]));
-    console.log('RENDER ', this.$path);
     return createElement(dbInputElement, {attrs, on: this.listeners$, scopedSlots: this.$scopedSlots}, children);
-
+    
   }
 
 }
