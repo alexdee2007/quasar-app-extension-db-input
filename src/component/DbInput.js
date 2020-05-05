@@ -62,7 +62,7 @@ export default {
       pref: this.$field.pref,
       language: this.$field.language,
       description: this.$field.description,
-      upperCase: this.$field.upperCase,
+      'upper-case': this.$field.upperCase,
       multiple: this.$field.multiple,
       cascade: this.$field.cascade,
       remote: this.$field.remote,
