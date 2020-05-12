@@ -109,7 +109,8 @@
       selectOptions() {
 
         let options = this.asyncOptions ? this.asyncOptions
-            : Array.isArray(this.dict) ? this.dict : this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] || null;
+            : Array.isArray(this.dict) ? this.dict
+            : this.$store.getters.DICT(`${this.dictName},${this.language}`);
 
         options = cloneDeep(options); // copy
 
@@ -172,7 +173,9 @@
       async filterFn(val, update, abort) {
         try {
           this.prepend = this.pref;
-          !this.selectOptions && this.dictName && (await this.loadDict());
+          if (!this.selectOptions || !this.selectOptions.length) {
+            this.dictName && (await this.loadDict());
+          }
           update(this.updateOptions(val, this.pref !== ''));
         } catch (err) {
           console.error(err);
@@ -204,23 +207,17 @@
       }
     },
     mounted() {
-      if (!this.selectOptions) {
+      if (!this.selectOptions || !this.selectOptions.length) {
         const unwatch = this.$watch('value', (val) => {
           val !== null && this.dictName && (this.loadDict());
         }, {immediate: true});
         unwatch();
       }
-
     },
     created() {
-      if (this.dictName && this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] === undefined) {
-        this.$store.dispatch('SET_DICT', {name: `${this.dictName}&language=${this.language}`, node: null});
-      }
       if (typeof this.dict === 'function') {
         this.asyncOptions = [];
-        this.asyncDict().then(options => {
-          this.asyncOptions = options;
-        });
+        this.asyncDict().then(options => this.asyncOptions = options);
       }
     }
   }

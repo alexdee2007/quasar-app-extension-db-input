@@ -82,8 +82,8 @@
     },
     computed: {
       selectOptions() {
-        return Array.isArray(this.dict) ? this.dict.map(obj => obj.value) : this.dictName && this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`]
-            ? this.$store.getters.DICT(`${this.dictName}&language=${this.language}`).map(obj => obj.value)
+        return Array.isArray(this.dict) ? this.dict.map(obj => obj.value)
+            : this.dictName ? this.$store.getters.DICT(`${this.dictName},${this.language}`).map(obj => obj.value)
             : null;
       }
     },
@@ -97,19 +97,16 @@
 
           if (typeof this.dict === 'function') {
             const dict = await this.dict(val);
-            return update(() => {
-              this.visibleOptions = dict;
-            });
+            return update(() => this.visibleOptions = dict);
           }
 
           if (this.remote) {
-            const dict = await this.$api.dict.chunk(this.dictName, val);
-            return update(() => {
-              this.visibleOptions = dict.node ? dict.node.map(obj => obj.value) : null;
-            });
+            const [name, language = 'UK'] = this.dictName.split(',');
+            const dict = val ? await this.$api.dict.chunk(name, language, val) : await this.$api.dict.total(name, language);
+            return update(() => this.visibleOptions = dict.node ? dict.node.map(obj => obj.value) : null);
           }
 
-          if (!this.selectOptions) {
+          if (!this.selectOptions || !this.selectOptions.length) {
             await this.loadDict();
           }
 
@@ -131,11 +128,6 @@
         } else if (this.value !== evt.target.value && !this.strict) {
           this.$emit('input', evt.target.value.toUpperCase());
         }
-      }
-    },
-    created() {
-      if (this.dictName && !this.remote && this.$store.getters.DICTS[`${this.dictName}&language=${this.language}`] === undefined) {
-        this.$store.dispatch('SET_DICT', {name: `${this.dictName}&language=${this.language}`, node: null});
       }
     }
   }

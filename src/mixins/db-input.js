@@ -76,7 +76,7 @@ export default {
         if (this.$refs.input.$refs.target && this.$refs.input.$refs.target.nodeName === 'INPUT') {
           this.$refs.input.$refs.target.readOnly = true;
         }
-        await this.$store.dispatch('GET_DICT', `${this.dictName}&language=${this.language}`);
+        await this.$store.dispatch('fetchDict', `${this.dictName},${this.language}`);
       } catch (err) {
         this.$q.notify({color: 'negative', timeout: 2500, html: true, multiLine: true, message: `<strong>Помилка завантаження довідника "${this.dictName}"</strong><br />${err.message}`, position: 'top', icon: 'error'});
       } finally {
