@@ -1,5 +1,6 @@
+import moment from 'moment';
 import { get } from 'lodash';
-import {lookup as mimeLookup} from 'mime-types';
+import { lookup as mimeLookup } from 'mime-types';
 import download from '../utils/download-file';
 
 export default {
@@ -15,11 +16,7 @@ export default {
         if (file.__status !== 'uploaded') {
           return false;
         }
-        if (!file.__presignedUrl) {
-          file.__presignedUrl = await this.$api.minio.getPresignedUrlForGet(file.__fullName);
-        }
-        download(file.__presignedUrl, file.name);
-
+        download(`${process.env.BASE_API}/api/minio/${file.__fullName}`, file.name);
       } catch (err) {
         console.error(err);
       } finally {
@@ -29,7 +26,7 @@ export default {
     async pushFileToList(fullName, index, list, payload, noPresignedUrl) {
       try {
         this.inProgress = true;
-        const url = noPresignedUrl ? undefined : await this.$api.minio.getPresignedUrlForGet(fullName);
+        const url = `${process.env.BASE_API}/api/minio/${fullName}`;
         const fileName = fullName.split('/').pop();
         const mimeType = mimeLookup(fileName);
         const file = {
@@ -44,7 +41,8 @@ export default {
 
         if (mimeType.toUpperCase().startsWith('IMAGE')) {
           let img = new Image();
-          !noPresignedUrl && (img.src = url);
+          //!noPresignedUrl && (img.src = url);
+          img.src = url;
           file.__img = img;
         }
 
@@ -60,18 +58,20 @@ export default {
       }
     },
     async factoryFn(files) {
+
       try {
         if (files.length === 1) {
 
-          const {url, fileName} = await this.$api.minio.getPresignedUrlForPut(this.folder, files[0].name);
-          const mimeType = mimeLookup(files[0].name);
-
-          if (mimeType.toUpperCase() === 'APPLICATION/PDF') {
-            files[0].__pdf = true;
-          }
-
+          const fileName = `${this.folder}/${moment().format('YYYY/MM/DD')}/${files[0].name}`;
           files[0].__fullName = fileName;
-          return {url, method: 'PUT', sendRaw: true};
+
+          return {
+            url: `${process.env.BASE_API}/api/minio/${fileName}`,
+            headers: [{name: 'Content-Type', value: 'application/octet-stream'}],
+            method: 'PUT',
+            sendRaw: true,
+            withCredentials: true
+          };
         }
       } catch (err) {
         console.error(err);

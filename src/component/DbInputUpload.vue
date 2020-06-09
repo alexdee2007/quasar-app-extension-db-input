@@ -10,6 +10,7 @@
       ::max-file-size="5242880"
       :factory="factoryFn"
       @uploaded="onUploaded"
+      @added="onAdded"
       >
 
       <template v-slot:header="scope">
@@ -108,6 +109,7 @@
   import { isEqual } from 'lodash';
   import dbInputMixin from '../mixins/db-input';
   import uploadMixin from '../mixins/upload';
+  import {v4 as uuidv4} from 'uuid';
 
   export default {
     name: 'DbInputUpload',
@@ -151,6 +153,19 @@
         info.files.forEach(file => {
           const model = new this.model({fileName: file.__fullName}, this.$parent.$model);
           this.value.push(model);
+        });
+      },
+      onAdded(files) {
+        files.forEach(file => {
+          const fileExt = file.name.split('.').pop();
+          if (fileExt.toUpperCase() === 'PDF') {
+            file.__pdf = true;
+          }
+          Object.defineProperty(file, 'name', {
+            writable: true,
+            value: `${uuidv4()}.${fileExt}`
+          });
+
         });
       }
     },
